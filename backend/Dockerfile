@@ -8,6 +8,6 @@ RUN CGO_ENABLED=0 GOOS=linux go build -o ./momo-backend ./cmd/api/
 # release
 FROM alpine:latest
 WORKDIR /app
-COPY --from=builder /app/run/momo-backend ./momo-backend
+COPY --from=builder /app/momo-backend ./momo-backend
 EXPOSE 8090
 ENTRYPOINT ["./momo-backend"]
