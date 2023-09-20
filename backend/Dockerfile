@@ -1,7 +1,7 @@
 # build
 FROM golang:1.19 as builder
-WORKDIR /usr/src/app
-COPY . .
+WORKDIR /app
+COPY go.mod go.sum ./
 RUN go mod download
 RUN CGO_ENABLED=0 GOOS=linux go build -o ./momo-backend
 
