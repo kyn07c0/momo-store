@@ -1,11 +1,11 @@
 <template>
-  <div class="container d-flex flex-column justify-content-between align-items-stretch h-100">
+  <div class="container d-flex flex-column justify-content-between align-items-stretch h-100" style="text-align=center">
 
     <div>
       <Alert v-if="error" v-model="error" class="alert-danger"/>
     </div>
 
-    <Center>
+    <div style="margin-left:auto; margin-right:auto">
 
       <Spinner 
         v-if="loading"
@@ -38,7 +38,7 @@
         </form>
       </div>
 
-    </Center>
+    </div>
 
     <div></div>
   </div>
