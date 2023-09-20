@@ -43,6 +43,7 @@ sonarqube-sast:
       -Dsonar.projectName=17_YURIKRYVINYA_MOMO_FRONT
 
 spotbugs-sast:
+  stage: test
   variables:
     COMPILE: "false"
     SAST_JAVA_VERSION: 11
