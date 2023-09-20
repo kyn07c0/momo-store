@@ -56,7 +56,6 @@ upload-frontend-latest:
   stage: release
   needs:
     - build
-    - spotbugs-sast
     - sonarqube-sast
   before_script:
     - until docker info; do sleep 1; done
