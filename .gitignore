@@ -16,3 +16,7 @@ vendor/
 .idea/
 .vscode/
 .DS_Store
+
+#terraform
+.terraform
+.terraform.lock.hcl
