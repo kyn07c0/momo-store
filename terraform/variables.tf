@@ -62,7 +62,8 @@ variable "v4_cidr_blocks" {
   default = "10.1.0.0/16"
 }
 
-variable "dns_domain" {
+variable "domain" {
   type = string
+  description = "Domain name"
   default = "kyn07c0.ru"
 }

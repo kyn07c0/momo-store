@@ -18,15 +18,15 @@ resource "yandex_vpc_security_group" "momo-main-sg" {
 }
 
 resource "yandex_dns_zone" "dns_domain" {
-  name = replace(var.dns_domain, ".", "-")
-  zone = join("", [var.dns_domain, "."])
+  name = replace(var.domain, ".", "-")
+  zone = join("", [var.domain, "."])
   public = true
   private_networks = [yandex_vpc_network.momo-network.id]
 }
 
 resource "yandex_dns_recordset" "dns_domain_record" {
   zone_id = yandex_dns_zone.dns_domain.id
-  name = join("", [var.dns_domain, "."])
+  name = join("", [var.domain, "."])
   type = "A"
   ttl = 200
   data = [yandex_vpc_address.addr.external_ipv4_address[0].address]
@@ -34,7 +34,7 @@ resource "yandex_dns_recordset" "dns_domain_record" {
 
 resource "yandex_dns_recordset" "dns_domain_record_momitoring" {
   zone_id = yandex_dns_zone.dns_domain.id
-  name = join("", ["monitoring.",var.dns_domain, "."])
+  name = join("", ["monitoring.",var.domain, "."])
   type = "A"
   ttl = 200
   data = [yandex_vpc_address.addr.external_ipv4_address[0].address]
@@ -42,7 +42,7 @@ resource "yandex_dns_recordset" "dns_domain_record_momitoring" {
 
 resource "yandex_dns_recordset" "dns_domain_record_grafana" {
   zone_id = yandex_dns_zone.dns_domain.id
-  name = join("", ["grafana.",var.dns_domain, "."])
+  name = join("", ["grafana.",var.domain, "."])
   type = "A"
   ttl = 200
   data = [yandex_vpc_address.addr.external_ipv4_address[0].address]
