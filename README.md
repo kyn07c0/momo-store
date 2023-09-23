@@ -27,7 +27,12 @@
 - ns1.yandexcloud.net
 - ns2.yandexcloud.net
 
-
+### Доступ к Yandex.Cloude 
+Создате временный iam-token для доступа к Yandex.Cloude
+```bash
+yc iam create-token
+```
+Присвойте значение токена переменной iam_token в файле terraform.tfvars.
 
 # Momo Store aka Пельменная №2
 
