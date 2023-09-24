@@ -1,5 +1,5 @@
 endpoint = "storage.yandexcloud.net"
-bucket = "momo-store-bucket"
+bucket = "kyn07c0-bucket"
 region = "ru-central1"
 key = "terraform/terraform.tfstate"
 access_key = "YCAJEmGWjyFZ2gGUbwH7Lc6dc"

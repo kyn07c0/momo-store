@@ -67,3 +67,51 @@ variable "domain" {
   description = "Domain name"
   default = "kyn07c0.ru"
 }
+
+variable "endpoint" {
+  type = string
+  description = "Endpoint"
+  default = "storage.yandexcloud.net"
+}
+
+variable "bucket" {
+  type = string
+  description = "bucket name"
+  default = "kyn07c0-bucket"
+}
+
+variable "region" {
+  type = string
+  description = "region"
+  default = "ru-central1"
+}
+
+variable "key" {
+  type = string
+  description = "key"
+  default = "terraform/terraform.tfstate"
+}
+
+variable "access_key" {
+  type = string
+  description = "access_key"
+  default = "YCAJEmGWjyFZ2gGUbwH7Lc6dc"
+}
+
+variable "secret_key" {
+  type = string
+  description = "secret_key"
+  default = "YCPBUsmOjG0y8OnntC1cFtYVejJPwPcgCcpoC7tA"
+}
+
+variable "skip_region_validation" {
+  type = bool
+  description = "Skip region validation"
+  default = true
+}
+
+variable "skip_credentials_validation" {
+  type = bool
+  description = "Skip credentials validation"
+  default = true
+}
