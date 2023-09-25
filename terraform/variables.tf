@@ -17,7 +17,7 @@ variable "cluster_name" {
   default = "momo-cluster"
 }
 
-variable "name" {
+variable "namespace" {
   type = string
   nullable = false
   description = "Name"
