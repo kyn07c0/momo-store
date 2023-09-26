@@ -62,12 +62,6 @@ variable "v4_cidr_blocks" {
   default = "10.1.0.0/16"
 }
 
-variable "domain" {
-  type = string
-  description = "Domain name"
-  default = "kyn07c0.ru"
-}
-
 variable "endpoint" {
   type = string
   description = "Endpoint"
@@ -115,3 +109,19 @@ variable "skip_credentials_validation" {
   description = "Skip credentials validation"
   default = true
 }
+
+
+
+
+variable "zone_id" {
+  type = string
+  description = "Zone ID"
+  default = ""
+}
+
+variable "certificate_id" {
+  type = string
+  description = "Certificate ID"
+  default = ""
+}
+

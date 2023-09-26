@@ -1,58 +1,17 @@
-resource "yandex_vpc_network" "momo-network" {
-  description = "Network for the Managed Service for Kubernetes cluster"
-  name = "momo-network"
+module "dns" {
+  source = "./modules/dns"
+  network_id = module.network.network_id
+  external_ipv4_address = module.network.external_ipv4_address
 }
 
-resource "yandex_vpc_subnet" "subnet-a" {
-  description = "Subnet in ru-central1-a availability zone"
-  name = "subnet-a"
-  zone = var.zone
-  network_id = yandex_vpc_network.momo-network.id
-  v4_cidr_blocks = [var.v4_cidr_blocks]
+module "network" {
+  source = "./modules/network"
 }
 
 resource "yandex_vpc_security_group" "momo-main-sg" {
   description = "Security group for the Managed Service for Kubernetes cluster"
   name = "momo-main-sg"
-  network_id = yandex_vpc_network.momo-network.id
-}
-
-resource "yandex_dns_zone" "dns_domain" {
-  name = replace(var.domain, ".", "-")
-  zone = join("", [var.domain, "."])
-  public = true
-  private_networks = [yandex_vpc_network.momo-network.id]
-}
-
-resource "yandex_dns_recordset" "dns_domain_record" {
-  zone_id = yandex_dns_zone.dns_domain.id
-  name = join("", [var.domain, "."])
-  type = "A"
-  ttl = 200
-  data = [yandex_vpc_address.addr.external_ipv4_address[0].address]
-}
-
-resource "yandex_dns_recordset" "dns_domain_record_momitoring" {
-  zone_id = yandex_dns_zone.dns_domain.id
-  name = join("", ["monitoring.",var.domain, "."])
-  type = "A"
-  ttl = 200
-  data = [yandex_vpc_address.addr.external_ipv4_address[0].address]
-}
-
-resource "yandex_dns_recordset" "dns_domain_record_grafana" {
-  zone_id = yandex_dns_zone.dns_domain.id
-  name = join("", ["grafana.",var.domain, "."])
-  type = "A"
-  ttl = 200
-  data = [yandex_vpc_address.addr.external_ipv4_address[0].address]
-}
-
-resource "yandex_vpc_address" "addr" {
-  name = "static-ip"
-  external_ipv4_address {
-    zone_id = "ru-central1-a"
-  }
+  network_id = module.network.network_id
 }
 
 resource "yandex_vpc_security_group_rule" "loadbalancer" {
@@ -60,7 +19,7 @@ resource "yandex_vpc_security_group_rule" "loadbalancer" {
   direction              = "ingress"
   security_group_binding = yandex_vpc_security_group.momo-main-sg.id
   protocol               = "TCP"
-  predefined_target      = "loadbalancer_healthchecks" # The load balancer's address range.
+  predefined_target      = "loadbalancer_healthchecks"
   from_port              = 0
   to_port                = 65535
 }
@@ -245,13 +204,13 @@ resource "yandex_resourcemanager_folder_iam_binding" "storage-viewer" {
 resource "yandex_kubernetes_cluster" "momo-cluster" {
   description = "Managed Service for Kubernetes cluster"
   name = var.cluster_name
-  network_id = yandex_vpc_network.momo-network.id
+  network_id = module.network.network_id
 
   master {
     version = var.ver
     zonal {
-      zone = yandex_vpc_subnet.subnet-a.zone
-      subnet_id = yandex_vpc_subnet.subnet-a.id
+      zone = module.network.subnet-a_zone
+      subnet_id = module.network.subnet-a_id
     }
 
     public_ip = true
@@ -280,7 +239,7 @@ resource "yandex_kubernetes_node_group" "momo-node-group" {
 
   allocation_policy {
     location {
-      zone = yandex_vpc_subnet.subnet-a.zone
+      zone = module.network.subnet-a_zone
     }
   }
 
@@ -289,7 +248,7 @@ resource "yandex_kubernetes_node_group" "momo-node-group" {
 
     network_interface {
       nat = true
-      subnet_ids = [yandex_vpc_subnet.subnet-a.id]
+      subnet_ids = [module.network.subnet-a_id]
       security_group_ids = [yandex_vpc_security_group.momo-main-sg.id]
     }
 
@@ -304,15 +263,6 @@ resource "yandex_kubernetes_node_group" "momo-node-group" {
     }
   }
 }
-
-#resource "yandex_cm_certificate" "le-certificate" {
-#  name    = "momo-cert"
-#  domains = ["kyn07c0.ru"]
-
-#  managed {
-#  challenge_type = "DNS_CNAME"
-#  }
-#}
 
 resource "helm_release" "cert-manager" {
   namespace = "cert-manager"
