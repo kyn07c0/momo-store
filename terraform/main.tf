@@ -305,6 +305,15 @@ resource "yandex_kubernetes_node_group" "momo-node-group" {
   }
 }
 
+#resource "yandex_cm_certificate" "le-certificate" {
+#  name    = "momo-cert"
+#  domains = ["kyn07c0.ru"]
+
+#  managed {
+#  challenge_type = "DNS_CNAME"
+#  }
+#}
+
 resource "helm_release" "cert-manager" {
   namespace = "cert-manager"
   create_namespace = true

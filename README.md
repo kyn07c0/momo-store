@@ -34,6 +34,52 @@ yc iam create-token
 ```
 Присвойте значение токена переменной iam_token в файле terraform.tfvars.
 
+### Сертификат доменного имени
+Добавте в конфигурационный файл Terraform ресурс сертификата
+```
+resource "yandex_cm_certificate" "le-certificate" {
+  name = "<имя_сертификата>"
+  domains = ["<домен>"]
+  managed {
+    challenge_type = "DNS_CNAME"
+  }
+}
+
+resource "yandex_dns_recordset" "validation-record" {
+  zone_id = "<идентификатор_зоны>"
+  name = yandex_cm_certificate.le-certificate.challenges[0].dns_name
+  type = yandex_cm_certificate.le-certificate.challenges[0].dns_type
+  data = [yandex_cm_certificate.le-certificate.challenges[0].dns_value]
+  ttl = <время_жизни_записи_секунд>
+}
+
+data "yandex_cm_certificate" "example" {
+  depends_on = [yandex_dns_recordset.example]
+  certificate_id = yandex_cm_certificate.example.id
+  wait_validation = true
+}
+
+# Use data.yandex_cm_certificate.example.id to get validated certificate
+
+output "cert-id" {
+  description = "Certificate ID"
+  value  = data.yandex_cm_certificate.example.id
+}
+```
+Создать ресурс
+```
+terraform validate
+terraform plan
+terraform apply
+```
+
+
+Проверить появление сертификата и его настройки
+```
+yc certificate-manager certificate get <имя_сертификата>
+```
+
+
 
 
 
