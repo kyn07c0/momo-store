@@ -5,12 +5,12 @@ metadata:
   name: frontend
   namespace: default
   annotations:
-    kubernetes.io/ingress.class: "nginx"
-    cert-manager.io/cluster-issuer: "letsencrypt"
+    ingress.alb.yc.io/subnets: e9bomsoea549opuoku3t
+    ingress.alb.yc.io/external-ipv4-address: 158.160.125.0
+    ingress.alb.yc.io/group-name: "momo-alb-group"
 spec:
-  ingressClassName: "nginx"
   tls:
-  - secretName: letsencrypt 
+  - secretName: yc-certmgr-cert-id-<идентификатор TLS-сертификата> 
     hosts:
     - "kyn07c0.ru"  
   rules:

@@ -98,7 +98,8 @@ terraform apply
 ```
 yc iam key create \
   --service-account-name <имя_сервисного_аккаунта_для_Ingress-контроллера> \
-  --format=json > sa-key.json
+  --format=json \
+  --output sa-key.json
 ```
 3) Для установки Helm-чарта с Ingress-контроллером выполните команды:
 ```
