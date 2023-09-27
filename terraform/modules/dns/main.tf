@@ -1,4 +1,4 @@
-resource "yandex_dns_zone" "domain" {
+resource "yandex_dns_zone" "zone" {
   name = replace(var.domain, ".", "-")
   zone = join("", [var.domain, "."])
   public = true
@@ -6,7 +6,7 @@ resource "yandex_dns_zone" "domain" {
 }
 
 resource "yandex_dns_recordset" "dns_domain_record" {
-  zone_id = yandex_dns_zone.domain.id
+  zone_id = yandex_dns_zone.zone.id
   name = join("", [var.domain, "."])
   type = "A"
   ttl = 200
@@ -14,7 +14,7 @@ resource "yandex_dns_recordset" "dns_domain_record" {
 }
 
 resource "yandex_dns_recordset" "dns_domain_record_momitoring" {
-  zone_id = yandex_dns_zone.domain.id
+  zone_id = yandex_dns_zone.zone.id
   name = join("", ["monitoring.",var.domain, "."])
   type = "A"
   ttl = 200
@@ -22,7 +22,7 @@ resource "yandex_dns_recordset" "dns_domain_record_momitoring" {
 }
 
 resource "yandex_dns_recordset" "dns_domain_record_grafana" {
-  zone_id = yandex_dns_zone.domain.id
+  zone_id = yandex_dns_zone.zone.id
   name = join("", ["grafana.",var.domain, "."])
   type = "A"
   ttl = 200
@@ -39,7 +39,7 @@ resource "yandex_cm_certificate" "le-certificate" {
 }
 
 resource "yandex_dns_recordset" "validation-record" {
-  zone_id = yandex_dns_zone.domain.id
+  zone_id = yandex_dns_zone.zone.id
   name = yandex_cm_certificate.le-certificate.challenges[0].dns_name
   type = yandex_cm_certificate.le-certificate.challenges[0].dns_type
   data = [yandex_cm_certificate.le-certificate.challenges[0].dns_value]
