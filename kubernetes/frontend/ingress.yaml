@@ -5,12 +5,12 @@ metadata:
   name: frontend
   namespace: default
   annotations:
-    ingress.alb.yc.io/subnets: e9bomsoea549opuoku3t
+    ingress.alb.yc.io/subnets: 10.96.0.0
     ingress.alb.yc.io/external-ipv4-address: 158.160.125.0
     ingress.alb.yc.io/group-name: "momo-alb-group"
 spec:
   tls:
-  - secretName: yc-certmgr-cert-id-<идентификатор TLS-сертификата> 
+  - secretName: yc-certmgr-cert-id-fpqq0u8o12boe1uvdu8r
     hosts:
     - "kyn07c0.ru"  
   rules:
