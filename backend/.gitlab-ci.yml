@@ -73,7 +73,7 @@ deploy:
     entrypoint: ['']
   script:
     - kubectl config set-cluster momo-cluster --server="${KUBE_SERVER}" --insecure-skip-tls-verify=true
-   #- kubectl config set clusters.momo-cluster.certificate-authority-data "${KUBE_CERTIFICATE_AUTHORITY}"
+  ##- kubectl config set clusters.momo-cluster.certificate-authority-data "${KUBE_CERTIFICATE_AUTHORITY}"
     - kubectl config set-credentials kyn07c0 --token="${KUBE_TOKEN}"
     - kubectl config set-context ${KUBE_USER}@${KUBE_CLUSTER} --cluster=${KUBE_CLUSTER} --user=${KUBE_USER}
     - kubectl config use-context ${KUBE_USER}@${KUBE_CLUSTER}
