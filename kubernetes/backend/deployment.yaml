@@ -28,11 +28,11 @@ spec:
         imagePullPolicy: Always
         ports:
         - name: backend
-          containerPort: 8090
+          containerPort: 8081
         livenessProbe:
           httpGet:
-            path: /actuator/health
-            port: 8090
+            path: /health
+            port: 8081
           initialDelaySeconds: 15
           periodSeconds: 30
           timeoutSeconds: 2
