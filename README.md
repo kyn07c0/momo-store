@@ -79,15 +79,52 @@ terraform apply
 yc certificate-manager certificate get <имя_сертификата>
 ```
 
-
-
-
-
 ```
 terraform init -backend-config=backend.tfvars
 terraform plan
 terraform apply
 ```
+
+
+
+## Установка Ingress-контроллера Application Load Balancer
+1) Назначте сервисному аккаунту роли:
+- alb.editor — для создания необходимых ресурсов
+- vpc.publicAdmin — для управления внешней связностью
+- certificate-manager.certificates.downloader — для работы с сертификатами, зарегистрированными в сервисе Yandex Certificate Manager
+- compute.viewer — для использования узлов кластера Managed Service for Kubernetes в целевых группах балансировщика
+
+2) Создайте статический ключ доступа для сервисного аккаунта в формате JSON
+```
+yc iam key create \
+  --service-account-name <имя_сервисного_аккаунта_для_Ingress-контроллера> \
+  --format=json > sa-key.json
+```
+3) Для установки Helm-чарта с Ingress-контроллером выполните команды:
+```
+export HELM_EXPERIMENTAL_OCI=1 && \
+cat sa-key.json | helm registry login cr.yandex --username 'json_key' --password-stdin && \
+helm pull oci://cr.yandex/yc-marketplace/yandex-cloud/yc-alb-ingress/yc-alb-ingress-controller-chart \
+  --version v0.1.22 \
+  --untar && \
+helm install \
+  --namespace <пространство_имен> \
+  --create-namespace \
+  --set folderId=<идентификатор_каталога> \
+  --set clusterId=<идентификатор_кластера> \
+  --set-file saKeySecretKey=sa-key.json \
+  yc-alb-ingress-controller ./yc-alb-ingress-controller-chart/
+```
+
+
+
+
+
+
+
+
+
+
 
 
 # Momo Store aka Пельменная №2

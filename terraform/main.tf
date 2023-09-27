@@ -217,8 +217,8 @@ resource "yandex_kubernetes_cluster" "momo-cluster" {
 
     security_group_ids = [yandex_vpc_security_group.momo-main-sg.id]
   }
-  service_account_id = yandex_iam_service_account.sa.id # Cluster service account ID.
-  node_service_account_id = yandex_iam_service_account.sa.id # Node group service account ID.
+  service_account_id = yandex_iam_service_account.sa.id
+  node_service_account_id = yandex_iam_service_account.sa.id
   depends_on = [
     yandex_resourcemanager_folder_iam_binding.editor,
     yandex_resourcemanager_folder_iam_binding.images-puller

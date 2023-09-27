@@ -4,12 +4,15 @@ kind: Ingress
 metadata:
   name: frontend
   namespace: default
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    cert-manager.io/cluster-issuer: "letsencrypt"
 spec:
   ingressClassName: "nginx"
   tls:
-  - secretName: ingress-example-tls
+  - secretName: letsencrypt 
     hosts:
-    - "kyn07c0.ru"
+    - "kyn07c0.ru"  
   rules:
   - host: "kyn07c0.ru"
     http:
