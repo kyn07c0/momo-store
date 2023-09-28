@@ -9,13 +9,13 @@ module "network" {
 }
 
 resource "yandex_vpc_security_group" "momo-main-sg" {
-  description = "Security group for the Managed Service for Kubernetes cluster"
+  description = "Группа безопасности для сервиса управления кластером Kubernetes"
   name = "momo-main-sg"
   network_id = module.network.network_id
 }
 
 resource "yandex_vpc_security_group_rule" "loadbalancer" {
-  description            = "The rule allows availability checks from the load balancer's range of addresses"
+  description            = "Правило разрешает проверку доступности из диапазона адресов балансировщика нагрузки"
   direction              = "ingress"
   security_group_binding = yandex_vpc_security_group.momo-main-sg.id
   protocol               = "TCP"
@@ -25,7 +25,7 @@ resource "yandex_vpc_security_group_rule" "loadbalancer" {
 }
 
 resource "yandex_vpc_security_group_rule" "node-interaction" {
-  description            = "The rule allows the master-node and node-node interaction within the security group"
+  description            = "Правило разрешает взаимодействие мастер-узла и узла внутри группы безопасности"
   direction              = "ingress"
   security_group_binding = yandex_vpc_security_group.momo-main-sg.id
   protocol               = "ANY"
@@ -35,7 +35,7 @@ resource "yandex_vpc_security_group_rule" "node-interaction" {
 }
 
 resource "yandex_vpc_security_group_rule" "pod-service-interaction" {
-  description            = "The rule allows the pod-pod and service-service interaction"
+  description            = "Правило разрешает взаимодействие под-под и сервис-сервис"
   direction              = "ingress"
   security_group_binding = yandex_vpc_security_group.momo-main-sg.id
   protocol               = "ANY"
@@ -45,7 +45,7 @@ resource "yandex_vpc_security_group_rule" "pod-service-interaction" {
 }
 
 resource "yandex_vpc_security_group_rule" "ICMP-debug" {
-  description            = "The rule allows receipt of debugging ICMP packets from internal subnets"
+  description            = "Правило разрешает прием отладочных ICMP-пакетов из внутренних подсетей"
   direction              = "ingress"
   security_group_binding = yandex_vpc_security_group.momo-main-sg.id
   protocol               = "ICMP"
@@ -53,7 +53,7 @@ resource "yandex_vpc_security_group_rule" "ICMP-debug" {
 }
 
 resource "yandex_vpc_security_group_rule" "port-6443" {
-  description            = "The rule allows connection to Kubernetes API on 6443 port from the Internet"
+  description            = "Правило разрешает подключение к Kubernetes API по порту 6443 из интернета"
   direction              = "ingress"
   security_group_binding = yandex_vpc_security_group.momo-main-sg.id
   protocol               = "TCP"
@@ -62,7 +62,7 @@ resource "yandex_vpc_security_group_rule" "port-6443" {
 }
 
 resource "yandex_vpc_security_group_rule" "port-443" {
-  description            = "The rule allows connection to Kubernetes API on 443 port from the Internet"
+  description            = "Правило разрешает подключение к Kubernetes API по порту 443 из интернета"
   direction              = "ingress"
   security_group_binding = yandex_vpc_security_group.momo-main-sg.id
   protocol               = "TCP"
@@ -71,7 +71,7 @@ resource "yandex_vpc_security_group_rule" "port-443" {
 }
 
 resource "yandex_vpc_security_group_rule" "outgoing-traffic" {
-  description            = "The rule allows all outgoing traffic"
+  description            = "Правило разрешает весь входящий трафик"
   direction              = "egress"
   security_group_binding = yandex_vpc_security_group.momo-main-sg.id
   protocol               = "ANY"
@@ -81,7 +81,7 @@ resource "yandex_vpc_security_group_rule" "outgoing-traffic" {
 }
 
 resource "yandex_vpc_security_group_rule" "SSH" {
-  description            = "The rule allows connection to Git repository by SSH on 22 port from the Internet"
+  description            = "Правило разрешает подключение к репозиторию Git по ssh из интернета"
   direction              = "ingress"
   security_group_binding = yandex_vpc_security_group.momo-main-sg.id
   protocol               = "TCP"
@@ -90,7 +90,7 @@ resource "yandex_vpc_security_group_rule" "SSH" {
 }
 
 resource "yandex_vpc_security_group_rule" "HTTP" {
-  description            = "The rule allows HTTP traffic"
+  description            = "Правило разрешает весь HTTP-трафик"
   direction              = "ingress"
   security_group_binding = yandex_vpc_security_group.momo-main-sg.id
   protocol               = "TCP"
@@ -99,7 +99,7 @@ resource "yandex_vpc_security_group_rule" "HTTP" {
 }
 
 resource "yandex_vpc_security_group_rule" "NodePort-access" {
-  description            = "The rule allows incoming traffic to port range of NodePort"
+  description            = "Правило разрешает входящий трафик в диапазоне портов NodePort"
   direction              = "ingress"
   security_group_binding = yandex_vpc_security_group.momo-main-sg.id
   protocol               = "TCP"
@@ -202,7 +202,6 @@ resource "yandex_resourcemanager_folder_iam_binding" "storage-viewer" {
 }
 
 resource "yandex_kubernetes_cluster" "momo-cluster" {
-  description = "Managed Service for Kubernetes cluster"
   name = var.cluster_name
   network_id = module.network.network_id
 
@@ -226,7 +225,7 @@ resource "yandex_kubernetes_cluster" "momo-cluster" {
 }
 
 resource "yandex_kubernetes_node_group" "momo-node-group" {
-  description = "Node group for the Managed Service for Kubernetes cluster"
+  description = "Группа узлов для сервиса управления кластером Kubernetes"
   name = "momo-node-group"
   cluster_id = yandex_kubernetes_cluster.momo-cluster.id
   version = var.ver
