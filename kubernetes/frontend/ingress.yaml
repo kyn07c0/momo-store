@@ -5,7 +5,7 @@ metadata:
   name: frontend
   namespace: default
   annotations:
-    ingress.alb.yc.io/subnets: e9b0b6b66ihr87enssli,e9b7pc6ie6v1bqkkodn4,e9bomsoea549opuoku3t
+    ingress.alb.yc.io/subnets: e9bomsoea549opuoku3t
     ingress.alb.yc.io/external-ipv4-address: 158.160.125.0
     ingress.alb.yc.io/group-name: "momo-alb-group"
 spec:
