@@ -25,6 +25,5 @@ variable "service_account_name" {
 
 variable "buckets" {
   description = "Buckets for storing the state of terraforms and application resources"
-  type        = list(string)
-#  default     = ["kyn07c0-terraform-state", "kyn07c0-momo-store"]
+  type = map
 }

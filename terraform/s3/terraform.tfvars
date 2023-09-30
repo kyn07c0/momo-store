@@ -3,4 +3,9 @@ zone = "ru-central1-a"
 cloud_id = "b1g9rramuashv1f7ie3a"
 folder_id = "b1g0j845i7calp33d0tc"
 service_account_name = "sa"
-buckets = ["kyn07c0-terraform-state", "kyn07c0-momo-store"]
+buckets = {
+  terraform_state = "kyn07c0-terraform"
+  app_sources = "kyn07c0-momo-store"
+}
+
+# ["kyn07c0-terraform-state", "kyn07c0-momo-store"]
