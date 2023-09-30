@@ -1,3 +1,14 @@
+module "service_account" {
+  source = "./modules/service_account"
+}
+
+
+
+
+
+
+
+/*
 module "dns" {
   source = "./modules/dns"
   network_id = module.network.network_id
@@ -124,83 +135,6 @@ resource "yandex_vpc_security_group_rule" "port-10501" {
   port                   = 10501
 }
 
-resource "yandex_iam_service_account" "sa" {
-  description = "Service account for the Managed Service for Kubernetes cluster and node group"
-  name = var.service_account
-}
-
-resource "yandex_resourcemanager_folder_iam_binding" "editor" {
-  folder_id = var.folder_id
-  role = "editor"
-  members = [
-    "serviceAccount:${yandex_iam_service_account.sa.id}"
-  ]
-}
-
-resource "yandex_resourcemanager_folder_iam_binding" "vpc-admin" {
-  folder_id = var.folder_id
-  role = "vpc.publicAdmin"
-  members = [
-    "serviceAccount:${yandex_iam_service_account.sa.id}"
-  ]
-}
-
-resource "yandex_resourcemanager_folder_iam_binding" "cert-downloader" {
-  folder_id = var.folder_id
-  role = "certificate-manager.certificates.downloader"
-  members = [
-    "serviceAccount:${yandex_iam_service_account.sa.id}"
-  ]
-}
-
-resource "yandex_resourcemanager_folder_iam_binding" "compute-viewer" {
-  folder_id = var.folder_id
-  role = "compute.viewer"
-  members = [
-    "serviceAccount:${yandex_iam_service_account.sa.id}"
-  ]
-}
-
-resource "yandex_resourcemanager_folder_iam_binding" "alb-editor" {
-  folder_id = var.folder_id
-  role = "alb.editor"
-  members = [
-    "serviceAccount:${yandex_iam_service_account.sa.id}"
-  ]
-}
-
-resource "yandex_resourcemanager_folder_iam_binding" "images-puller" {
-  folder_id = var.folder_id
-  role = "container-registry.images.puller"
-  members = [
-    "serviceAccount:${yandex_iam_service_account.sa.id}"
-  ]
-}
-
-resource "yandex_resourcemanager_folder_iam_binding" "images-pusher" {
-  folder_id = var.folder_id
-  role = "container-registry.images.pusher"
-  members = [
-    "serviceAccount:${yandex_iam_service_account.sa.id}"
-  ]
-}
-
-resource "yandex_resourcemanager_folder_iam_binding" "storage-uploader" {
-  folder_id = var.folder_id
-  role = "storage.uploader"
-  members = [
-    "serviceAccount:${yandex_iam_service_account.sa.id}"
-  ]
-}
-
-resource "yandex_resourcemanager_folder_iam_binding" "storage-viewer" {
-  folder_id = var.folder_id
-  role = "storage.viewer"
-  members = [
-    "serviceAccount:${yandex_iam_service_account.sa.id}"
-  ]
-}
-
 resource "yandex_kubernetes_cluster" "momo-cluster" {
   name = var.cluster_name
   network_id = module.network.network_id
@@ -262,20 +196,4 @@ resource "yandex_kubernetes_node_group" "momo-node-group" {
     }
   }
 }
-
-resource "helm_release" "cert-manager" {
-  namespace = "cert-manager"
-  create_namespace = true
-  name = "jetstack"
-  repository = "https://charts.jetstack.io"
-  chart = "cert-manager"
-  version = "v1.13.0"
-  wait = true
-  depends_on = [
-    yandex_kubernetes_node_group.momo-node-group
-  ]
-  set {
-    name = "installCRDs"
-    value = true
-  }
-}
+*/
