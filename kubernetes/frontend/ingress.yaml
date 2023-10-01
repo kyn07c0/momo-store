@@ -10,10 +10,10 @@ metadata:
 spec:
   tls:
     - hosts:
-      - https://kyn07c0.ru
-      secretName: momo-{{ .Values.global.environment }}
+      - kyn07c0.ru
+      secretName: letsencrypt 
   rules:
-    - host: https://kyn07c0.ru
+    - host: kyn07c0.ru
       http:
         paths:
         - path: /
