@@ -67,9 +67,18 @@ terraform plan
 terraform apply
 ```
 
-
-
-
+## Настройка кластера Kubernetes
+1) Создайте статический файл конфигурации для доступа к кластеру Kubernetes
+2) Установите Ingress-контроллер NGINX
+```
+helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx 
+helm repo update
+helm install ingress-nginx ingress-nginx/ingress-nginx
+```
+3) Установите менеджер сертификатов
+```
+kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v1.13.1/cert-manager.yaml
+```
 
 
 
