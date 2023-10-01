@@ -57,6 +57,8 @@ region = "ru-central1"
 key = "<путь_к_файлу_состояния_в_бакете>/<имя_файла_состояния>.tfstate"
 access_key = "<идентификатор_ключа>"
 secret_key = "<секретный_ключ>"
+skip_region_validation      = true
+skip_credentials_validation = true
 ```
 
 
