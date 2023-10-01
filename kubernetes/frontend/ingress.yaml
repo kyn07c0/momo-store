@@ -6,14 +6,14 @@ metadata:
   namespace: default
   annotations:
     kubernetes.io/ingress.class: "nginx"
-    cert-manager.io/cluster-issuer: "momo-cluster"
+    cert-manager.io/cluster-issuer: "letsencrypt"
 spec:
   tls:
     - hosts:
-      - kyn07c0.ru
+      - https://kyn07c0.ru
       secretName: momo-{{ .Values.global.environment }}
   rules:
-    - host: kyn07c0.ru
+    - host: https://kyn07c0.ru
       http:
         paths:
         - path: /
