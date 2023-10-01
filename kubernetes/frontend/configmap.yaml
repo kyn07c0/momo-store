@@ -35,29 +35,5 @@ data:
             index  index.html;
             try_files $uri $uri/ /index.html;
           }
-
-          location /products {
-              proxy_pass http://backend:8081;
-          }
-
-          location /categories {
-              proxy_pass http://backend:8081;
-          }
-
-          location /orders {
-              proxy_pass http://backend:8081;
-          }
-
-          location /metrics {
-              proxy_pass http://backend:8081;
-          }
-
-          location /auth/whoami {
-              proxy_pass http://backend:8081;
-          }
-  
-          location /api {
-              proxy_pass http://backend:8081;
-          }
         }
     }
