@@ -21,7 +21,7 @@
 - Создание кластера Kubernetes
 
 ### Создание бакета
-1) Перейти в директорию s3/bucket
+1) Перейти в директорию terraform/s3
 2) Присвоить значения переменным в файле terraform.tfvars
 ```
 token = "<IAM-_или_OAuth-токен>"
@@ -42,10 +42,22 @@ terraform apply
 terraform output -json
 ```
 
+### Создание кластера Kubernetes
+1) Перейдите в директорию terraform/kubernetes
+2) Присвоить значения переменным в файле terraform.tfvars
+```
+token = "<IAM-_или_OAuth-токен>"
+service_account_id = "<идентификатор_сервисного_аккаунта>"
+cloud_id = "<идентификатор_облака>"
+folder_id = "<идентификатор_каталога>"
 
-
-
-
+endpoint = "storage.yandexcloud.net"
+bucket = "<имя_бакета>"
+region = "ru-central1"
+key = "<путь_к_файлу_состояния_в_бакете>/<имя_файла_состояния>.tfstate"
+access_key = "<идентификатор_ключа>"
+secret_key = "<секретный_ключ>"
+```
 
 
 
