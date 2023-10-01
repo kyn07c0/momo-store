@@ -79,6 +79,21 @@ helm install ingress-nginx ingress-nginx/ingress-nginx
 ```
 kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v1.13.1/cert-manager.yaml
 ```
+4) Убедитесь, что в пространстве имен cert-manager создано три пода с готовностью 1/1 и статусом Running:
+```
+kubectl get pods -n cert-manager --watch
+```
+
+
+
+
+
+
+
+
+
+
+
 
 
 
