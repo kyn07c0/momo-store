@@ -1,7 +1,7 @@
 # build
 FROM node:16-alpine3.18 as builder
-ARG VUE_APP_API_URL
-ARG VUE_APP_VERSION
+ARG VERSION=${VERSION}
+ARG NODE_ENV
 WORKDIR /usr/src/app
 COPY package*.json ./
 COPY . .
@@ -10,6 +10,7 @@ RUN npm run build
 
 # release
 FROM nginx:latest
+ARG VERSION=${VERSION}
 COPY --from=builder /usr/src/app/dist /usr/share/nginx/html
 EXPOSE 80
 
