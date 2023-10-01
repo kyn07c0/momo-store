@@ -1,12 +1,11 @@
-variable "service_account" {
+variable "service_account_id" {
   type = string
-  description =  "Service account name"
-  default = "sa"
+  description =  "Service account ID"
 }
 
-variable "iam_token" {
+variable "token" {
   type = string
-  description =  "IAM token"
+  description =  "Token"
   sensitive = "true"
 }
 
@@ -34,13 +33,11 @@ variable "ver" {
 variable "cloud_id" {
   type = string
   description =  "Cloud ID"
-  default = "b1g9rramuashv1f7ie3a"
 }
 
 variable "folder_id" {
   type = string
   description =  "Folder ID"
-  default = "b1g0j845i7calp33d0tc"
 }
 
 variable "zone" {
@@ -71,7 +68,6 @@ variable "endpoint" {
 variable "bucket" {
   type = string
   description = "bucket name"
-  default = "kyn07c0-bucket"
 }
 
 variable "region" {

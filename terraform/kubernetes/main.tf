@@ -1,5 +1,58 @@
-module "service_account" {
-  source = "./modules/service_account"
+resource "yandex_resourcemanager_folder_iam_binding" "editor" {
+  folder_id = var.folder_id
+  role = "editor"
+  members = ["serviceAccount:${var.service_account_id}"]
+}
+
+resource "yandex_resourcemanager_folder_iam_binding" "images-puller" {
+  folder_id = var.folder_id
+  role = "container-registry.images.puller"
+  members = ["serviceAccount:${var.service_account_id}"]
+}
+
+
+
+
+#resource "yandex_resourcemanager_folder_iam_binding" "vpc-admin" {
+#  folder_id = var.folder_id
+#  role = "vpc.publicAdmin"
+#  members = ["serviceAccount:${var.service_account_id}"]
+#}
+
+resource "yandex_resourcemanager_folder_iam_binding" "cert-downloader" {
+  folder_id = var.folder_id
+  role = "certificate-manager.certificates.downloader"
+  members = ["serviceAccount:${var.service_account_id}"]
+}
+
+#resource "yandex_resourcemanager_folder_iam_binding" "compute-viewer" {
+#  folder_id = var.folder_id
+#  role = "compute.viewer"
+#  members = ["serviceAccount:${var.service_account_id}"]
+#}
+
+resource "yandex_resourcemanager_folder_iam_binding" "alb-editor" {
+  folder_id = var.folder_id
+  role = "alb.editor"
+  members = ["serviceAccount:${var.service_account_id}"]
+}
+
+resource "yandex_resourcemanager_folder_iam_binding" "images-pusher" {
+  folder_id = var.folder_id
+  role = "container-registry.images.pusher"
+  members = ["serviceAccount:${var.service_account_id}"]
+}
+
+resource "yandex_resourcemanager_folder_iam_binding" "storage-uploader" {
+  folder_id = var.folder_id
+  role = "storage.uploader"
+  members = ["serviceAccount:${var.service_account_id}"]
+}
+
+resource "yandex_resourcemanager_folder_iam_binding" "storage-viewer" {
+  folder_id = var.folder_id
+  role = "storage.viewer"
+  members = ["serviceAccount:${var.service_account_id}"]
 }
 
 
@@ -8,7 +61,142 @@ module "service_account" {
 
 
 
-/*
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+resource "yandex_vpc_network" "momo-network" {
+  description = "Network for the Managed Service for Kubernetes cluster"
+  name = "momo-network"
+}
+
+resource "yandex_vpc_subnet" "subnet" {
+  description = "Subnet in ru-central1-a availability zone"
+  name = "subnet-a"
+  zone = var.zone
+  network_id = yandex_vpc_network.momo-network.id
+  v4_cidr_blocks = [var.v4_cidr_blocks]
+}
+
+resource "yandex_kubernetes_cluster" "momo-cluster" {
+  name = var.cluster_name
+  network_id = yandex_vpc_network.momo-network.id
+
+  master {
+    version = var.ver
+    zonal {
+      zone = yandex_vpc_subnet.subnet.zone
+      subnet_id = yandex_vpc_subnet.subnet.id
+    }
+    public_ip = true 
+  }
+  service_account_id = var.service_account_id
+  node_service_account_id = var.service_account_id
+  depends_on = [
+    yandex_resourcemanager_folder_iam_binding.editor,
+    yandex_resourcemanager_folder_iam_binding.images-puller
+  ]
+}
+
+resource "yandex_kubernetes_node_group" "momo-node-group" {
+  name = "momo-node-group"
+  cluster_id = yandex_kubernetes_cluster.momo-cluster.id
+  version = var.ver
+
+  scale_policy {
+    fixed_scale {
+      size = 1
+    }
+  }
+
+  allocation_policy {
+    location {
+      zone = yandex_vpc_subnet.subnet.zone
+    }
+  }
+
+  instance_template {
+    platform_id = "standard-v2"
+
+    network_interface {
+      nat = true
+      subnet_ids = [yandex_vpc_subnet.subnet.id]
+    }
+
+    resources {
+      memory = 4
+      cores  = 2
+    }
+
+    boot_disk {
+      type = "network-hdd"
+      size = 30
+    }
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*module "service_account" {
+  source = "./modules/service_account"
+
+  cloud_id = var.cloud_id
+  folder_id = var.folder_id
+  service_account_id = var.service_account_id
+}
+
+
 module "dns" {
   source = "./modules/dns"
   network_id = module.network.network_id

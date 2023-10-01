@@ -20,10 +20,10 @@ variable "folder_id" {
 
 variable "service_account_name" {
   description = "Service account name"
-  type        = string
+  type = string
 }
 
-variable "buckets" {
-  description = "Buckets for storing the state of terraforms and application resources"
-  type = map
+variable "bucket" {
+  description = "Bucket for storing the state of terraforms and application resources"
+  type = string
 }
