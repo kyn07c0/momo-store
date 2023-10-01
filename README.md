@@ -60,6 +60,12 @@ secret_key = "<секретный_ключ>"
 skip_region_validation      = true
 skip_credentials_validation = true
 ```
+3) Последовательно выполнить команды
+```
+terraform init
+terraform plan
+terraform apply
+```
 
 
 
