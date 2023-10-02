@@ -4,14 +4,12 @@ kind: Ingress
 metadata:
   name: frontend-ingress
   namespace: default
-  annotations:
-    kubernetes.io/ingress.class: "nginx"
-    cert-manager.io/cluster-issuer: "momo-cert"
 spec:
+  ingressClassName: nginx
   tls:
     - hosts:
       - "kyn07c0.ru"
-      secretName: momo-cert 
+      secretName: docker-config-secret 
   rules:
     - host: "kyn07c0.ru"
       http:
