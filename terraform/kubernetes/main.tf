@@ -10,14 +10,11 @@ resource "yandex_resourcemanager_folder_iam_binding" "images-puller" {
   members = ["serviceAccount:${var.service_account_id}"]
 }
 
-
-
-
-#resource "yandex_resourcemanager_folder_iam_binding" "vpc-admin" {
-#  folder_id = var.folder_id
-#  role = "vpc.publicAdmin"
-#  members = ["serviceAccount:${var.service_account_id}"]
-#}
+resource "yandex_resourcemanager_folder_iam_binding" "vpc-admin" {
+  folder_id = var.folder_id
+  role = "vpc.publicAdmin"
+  members = ["serviceAccount:${var.service_account_id}"]
+}
 
 resource "yandex_resourcemanager_folder_iam_binding" "cert-downloader" {
   folder_id = var.folder_id
@@ -25,11 +22,11 @@ resource "yandex_resourcemanager_folder_iam_binding" "cert-downloader" {
   members = ["serviceAccount:${var.service_account_id}"]
 }
 
-#resource "yandex_resourcemanager_folder_iam_binding" "compute-viewer" {
-#  folder_id = var.folder_id
-#  role = "compute.viewer"
-#  members = ["serviceAccount:${var.service_account_id}"]
-#}
+resource "yandex_resourcemanager_folder_iam_binding" "compute-viewer" {
+  folder_id = var.folder_id
+  role = "compute.viewer"
+  members = ["serviceAccount:${var.service_account_id}"]
+}
 
 resource "yandex_resourcemanager_folder_iam_binding" "alb-editor" {
   folder_id = var.folder_id
@@ -59,52 +56,122 @@ resource "yandex_resourcemanager_folder_iam_binding" "storage-viewer" {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-resource "yandex_vpc_network" "momo-network" {
+resource "yandex_vpc_network" "k8s-network" {
   description = "Network for the Managed Service for Kubernetes cluster"
-  name = "momo-network"
+  name = "k8s-network"
 }
 
-resource "yandex_vpc_subnet" "subnet" {
+resource "yandex_vpc_subnet" "subnet-a" {
   description = "Subnet in ru-central1-a availability zone"
   name = "subnet-a"
   zone = var.zone
-  network_id = yandex_vpc_network.momo-network.id
+  network_id = yandex_vpc_network.k8s-network.id
   v4_cidr_blocks = [var.v4_cidr_blocks]
 }
 
-resource "yandex_kubernetes_cluster" "momo-cluster" {
-  name = var.cluster_name
-  network_id = yandex_vpc_network.momo-network.id
+
+
+
+resource "yandex_vpc_security_group" "k8s-main-sg" {
+  name        = "k8s-main-sg"
+  network_id  = yandex_vpc_network.k8s-network.id
+  ingress {
+    protocol          = "TCP"
+    predefined_target = "loadbalancer_healthchecks"
+    from_port         = 0
+    to_port           = 65535
+  }
+  ingress {
+    protocol          = "ANY"
+    predefined_target = "self_security_group"
+    from_port         = 0
+    to_port           = 65535
+  }
+  ingress {
+    protocol       = "ANY"
+    v4_cidr_blocks = ["10.96.0.0/16", "10.112.0.0/16"]
+    from_port      = 0
+    to_port        = 65535
+  }
+  ingress {
+    protocol       = "ICMP"
+    v4_cidr_blocks = ["172.16.0.0/12", "10.0.0.0/8", "192.168.0.0/16"]
+  }
+  egress {
+    protocol       = "ANY"
+    v4_cidr_blocks = ["0.0.0.0/0"]
+    from_port      = 0
+    to_port        = 65535
+  }
+}
+
+
+
+resource "yandex_vpc_security_group" "k8s-public-services" {
+  name        = "k8s-public-services"
+  network_id  = yandex_vpc_network.k8s-network.id
+
+  ingress {
+    protocol       = "TCP"
+    v4_cidr_blocks = ["0.0.0.0/0"]
+    from_port      = 30000
+    to_port        = 32767
+  }
+}
+
+resource "yandex_vpc_security_group" "k8s-nodes-ssh-access" {
+  name        = "k8s-nodes-ssh-access"
+  network_id  = yandex_vpc_network.k8s-network.id
+
+  ingress {
+    protocol       = "TCP"
+    v4_cidr_blocks = ["0.0.0.0/0"]
+    port           = 22
+  }
+}
+
+resource "yandex_vpc_security_group" "k8s-master-whitelist" {
+  name        = "k8s-master-whitelist"
+  network_id  = yandex_vpc_network.k8s-network.id
+
+  ingress {
+    protocol       = "TCP"
+    v4_cidr_blocks = ["0.0.0.0/0"]
+    port           = 6443
+  }
+
+  ingress {
+    protocol       = "TCP"
+    v4_cidr_blocks = ["0.0.0.0/0"]
+    port           = 443
+  }
+
+  ingress {
+    protocol       = "TCP"
+    v4_cidr_blocks = ["0.0.0.0/0"]
+    port           = 80
+  }
+}
+
+
+
+
+resource "yandex_kubernetes_cluster" "k8s-cluster" {
+  name = "k8s-cluster"
+  network_id = yandex_vpc_network.k8s-network.id
 
   master {
     version = var.ver
     zonal {
-      zone = yandex_vpc_subnet.subnet.zone
-      subnet_id = yandex_vpc_subnet.subnet.id
+      zone = yandex_vpc_subnet.subnet-a.zone
+      subnet_id = yandex_vpc_subnet.subnet-a.id
     }
+
+    security_group_ids = [
+      yandex_vpc_security_group.k8s-main-sg.id,
+      yandex_vpc_security_group.k8s-master-whitelist.id
+    ]
+
     public_ip = true 
   }
   service_account_id = var.service_account_id
@@ -115,9 +182,9 @@ resource "yandex_kubernetes_cluster" "momo-cluster" {
   ]
 }
 
-resource "yandex_kubernetes_node_group" "momo-node-group" {
-  name = "momo-node-group"
-  cluster_id = yandex_kubernetes_cluster.momo-cluster.id
+resource "yandex_kubernetes_node_group" "k8s-node-group" {
+  name = "k8s-node-group"
+  cluster_id = yandex_kubernetes_cluster.k8s-cluster.id
   version = var.ver
 
   scale_policy {
@@ -128,16 +195,21 @@ resource "yandex_kubernetes_node_group" "momo-node-group" {
 
   allocation_policy {
     location {
-      zone = yandex_vpc_subnet.subnet.zone
+      zone = yandex_vpc_subnet.subnet-a.zone
     }
   }
 
   instance_template {
-    platform_id = "standard-v2"
+    platform_id = "standard-v3"
 
     network_interface {
       nat = true
-      subnet_ids = [yandex_vpc_subnet.subnet.id]
+      subnet_ids = [yandex_vpc_subnet.subnet-a.id]
+      security_group_ids = [
+        yandex_vpc_security_group.k8s-main-sg.id,
+        yandex_vpc_security_group.k8s-nodes-ssh-access.id,
+        yandex_vpc_security_group.k8s-public-services.id
+      ]
     }
 
     resources {
@@ -156,232 +228,36 @@ resource "yandex_kubernetes_node_group" "momo-node-group" {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*module "service_account" {
-  source = "./modules/service_account"
-
-  cloud_id = var.cloud_id
-  folder_id = var.folder_id
-  service_account_id = var.service_account_id
-}
-
-
-module "dns" {
-  source = "./modules/dns"
-  network_id = module.network.network_id
-  external_ipv4_address = module.network.external_ipv4_address
-}
-
-module "network" {
-  source = "./modules/network"
-}
-
-resource "yandex_vpc_security_group" "momo-main-sg" {
-  description = "Группа безопасности для сервиса управления кластером Kubernetes"
-  name = "momo-main-sg"
-  network_id = module.network.network_id
-}
-
-resource "yandex_vpc_security_group_rule" "loadbalancer" {
-  description            = "Правило разрешает проверку доступности из диапазона адресов балансировщика нагрузки"
-  direction              = "ingress"
-  security_group_binding = yandex_vpc_security_group.momo-main-sg.id
-  protocol               = "TCP"
-  predefined_target      = "loadbalancer_healthchecks"
-  from_port              = 0
-  to_port                = 65535
-}
-
-resource "yandex_vpc_security_group_rule" "node-interaction" {
-  description            = "Правило разрешает взаимодействие мастер-узла и узла внутри группы безопасности"
-  direction              = "ingress"
-  security_group_binding = yandex_vpc_security_group.momo-main-sg.id
-  protocol               = "ANY"
-  predefined_target      = "self_security_group"
-  from_port              = 0
-  to_port                = 65535
-}
-
-resource "yandex_vpc_security_group_rule" "pod-service-interaction" {
-  description            = "Правило разрешает взаимодействие под-под и сервис-сервис"
-  direction              = "ingress"
-  security_group_binding = yandex_vpc_security_group.momo-main-sg.id
-  protocol               = "ANY"
-  v4_cidr_blocks         = [var.v4_cidr_blocks]
-  from_port              = 0
-  to_port                = 65535
-}
-
-resource "yandex_vpc_security_group_rule" "ICMP-debug" {
-  description            = "Правило разрешает прием отладочных ICMP-пакетов из внутренних подсетей"
-  direction              = "ingress"
-  security_group_binding = yandex_vpc_security_group.momo-main-sg.id
-  protocol               = "ICMP"
-  v4_cidr_blocks         = [var.v4_cidr_blocks]
-}
-
-resource "yandex_vpc_security_group_rule" "port-6443" {
-  description            = "Правило разрешает подключение к Kubernetes API по порту 6443 из интернета"
-  direction              = "ingress"
-  security_group_binding = yandex_vpc_security_group.momo-main-sg.id
-  protocol               = "TCP"
-  v4_cidr_blocks         = ["0.0.0.0/0"]
-  port                   = 6443
-}
-
-resource "yandex_vpc_security_group_rule" "port-443" {
-  description            = "Правило разрешает подключение к Kubernetes API по порту 443 из интернета"
-  direction              = "ingress"
-  security_group_binding = yandex_vpc_security_group.momo-main-sg.id
-  protocol               = "TCP"
-  v4_cidr_blocks         = ["0.0.0.0/0"]
-  port                   = 443
-}
-
-resource "yandex_vpc_security_group_rule" "outgoing-traffic" {
-  description            = "Правило разрешает весь входящий трафик"
-  direction              = "egress"
-  security_group_binding = yandex_vpc_security_group.momo-main-sg.id
-  protocol               = "ANY"
-  v4_cidr_blocks         = ["0.0.0.0/0"]
-  from_port              = 0
-  to_port                = 65535
-}
-
-resource "yandex_vpc_security_group_rule" "SSH" {
-  description            = "Правило разрешает подключение к репозиторию Git по ssh из интернета"
-  direction              = "ingress"
-  security_group_binding = yandex_vpc_security_group.momo-main-sg.id
-  protocol               = "TCP"
-  v4_cidr_blocks         = ["0.0.0.0/0"]
-  port                   = 22
-}
-
-resource "yandex_vpc_security_group_rule" "HTTP" {
-  description            = "Правило разрешает весь HTTP-трафик"
-  direction              = "ingress"
-  security_group_binding = yandex_vpc_security_group.momo-main-sg.id
-  protocol               = "TCP"
-  v4_cidr_blocks         = ["0.0.0.0/0"]
-  port                   = 80
-}
-
-resource "yandex_vpc_security_group_rule" "NodePort-access" {
-  description            = "Правило разрешает входящий трафик в диапазоне портов NodePort"
-  direction              = "ingress"
-  security_group_binding = yandex_vpc_security_group.momo-main-sg.id
-  protocol               = "TCP"
-  v4_cidr_blocks         = ["0.0.0.0/0"]
-  from_port              = 30000
-  to_port                = 32767
-}
-
-resource "yandex_vpc_security_group_rule" "port-10502" {
-  direction              = "ingress"
-  security_group_binding = yandex_vpc_security_group.momo-main-sg.id
-  predefined_target      = "self_security_group"
-  protocol               = "TCP"
-  port                   = 10502
-}
-
-resource "yandex_vpc_security_group_rule" "port-10501" {
-  direction              = "ingress"
-  security_group_binding = yandex_vpc_security_group.momo-main-sg.id
-  predefined_target      = "self_security_group"
-  protocol               = "TCP"
-  port                   = 10501
-}
-
-resource "yandex_kubernetes_cluster" "momo-cluster" {
-  name = var.cluster_name
-  network_id = module.network.network_id
-
-  master {
-    version = var.ver
-    zonal {
-      zone = module.network.subnet-a_zone
-      subnet_id = module.network.subnet-a_id
-    }
-
-    public_ip = true
-
-    security_group_ids = [yandex_vpc_security_group.momo-main-sg.id]
-  }
-  service_account_id = yandex_iam_service_account.sa.id
-  node_service_account_id = yandex_iam_service_account.sa.id
-  depends_on = [
-    yandex_resourcemanager_folder_iam_binding.editor,
-    yandex_resourcemanager_folder_iam_binding.images-puller
-  ]
-}
-
-resource "yandex_kubernetes_node_group" "momo-node-group" {
-  description = "Группа узлов для сервиса управления кластером Kubernetes"
-  name = "momo-node-group"
-  cluster_id = yandex_kubernetes_cluster.momo-cluster.id
-  version = var.ver
-
-  scale_policy {
-    fixed_scale {
-      size = 1
-    }
-  }
-
-  allocation_policy {
-    location {
-      zone = module.network.subnet-a_zone
-    }
-  }
-
-  instance_template {
-    platform_id = "standard-v2"
-
-    network_interface {
-      nat = true
-      subnet_ids = [module.network.subnet-a_id]
-      security_group_ids = [yandex_vpc_security_group.momo-main-sg.id]
-    }
-
-    resources {
-      memory = 4 
-      cores  = 2
-    }
-
-    boot_disk {
-      type = "network-hdd"
-      size = 30
-    }
+resource "yandex_vpc_address" "addr" {
+  name = "static-ip"
+  external_ipv4_address {
+    zone_id = "ru-central1-a"
   }
 }
-*/
+
+resource "yandex_dns_zone" "zone" {
+  name = "public-zone"
+  zone = "kyn07c0.ru."
+  public = true
+}
+
+resource "yandex_dns_recordset" "rs1" {
+  zone_id = yandex_dns_zone.zone.id
+  name    = "kyn07c0.ru."
+  type    = "A"
+  ttl     = 200
+  data    = [yandex_vpc_address.addr.external_ipv4_address[0].address]
+}
+
+
+
+
+resource "yandex_cm_certificate" "le-certificate" {
+  name    = "cert-kyn07c0"
+  domains = ["kyn07c0.ru"]
+
+  managed {
+    challenge_type = "DNS_CNAME"
+    challenge_count = 1
+  }
+}
