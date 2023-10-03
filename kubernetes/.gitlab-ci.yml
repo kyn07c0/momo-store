@@ -24,6 +24,6 @@ install-helm-chart:
     - helm repo add nexus ${NEXUS_HELM_REPO} --username ${NEXUS_HELM_USER} --password ${NEXUS_HELM_PASS}
     - helm repo update
     - >
-      helm upgrade --atomic -i
+      helm upgrade --atomic --debug -i
       --set dockerconfigjson="${DOCKER_CONFIG_JSON}"
       momo-store nexus/momo-store --version $VERSION
