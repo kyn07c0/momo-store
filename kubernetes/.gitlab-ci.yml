@@ -11,7 +11,7 @@ release-helm-chart:
   script:
     - cd kubernetes
     - helm package momo-store-chart --version $CHART_VERSION
-    - curl -u ${NEXUS_HELM_USER}:${NEXUS_HELM_PASS} --upload-file momo-store-${CHART_VERSION}.tgz ${NEXUS_HELM_REPO}
+    - curl -u ${NEXUS_HELM_USER}:${NEXUS_HELM_PASS} ${NEXUS_HELM_REPO} --upload-file momo-store-${CHART_VERSION}.tgz
 
 install-helm-chart:
   variables:
