@@ -3,15 +3,16 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: frontend-ingress
-  annotations:
-    kubernetes.io/ingress.class: nginx
-    cert-manager.io/cluster-issuer: letsencrypt
-    acme.cert-manager.io/http01-edit-in-place: "true"
+  #annotations:
+  #  kubernetes.io/ingress.class: nginx
+  #  cert-manager.io/cluster-issuer: letsencrypt
+  #  acme.cert-manager.io/http01-edit-in-place: "true"
 spec:
+  ingressClassName: "nginx"
   tls:
   - hosts:
     - "kyn07c0.ru"
-    secretName: cert-kyn07c0
+    secretName: letsencrypt
   rules:
   - host: "kyn07c0.ru"
     http:

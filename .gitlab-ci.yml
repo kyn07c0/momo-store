@@ -1,5 +1,6 @@
 stages:
   - module-pipelines
+  - deploy
 
 backend:
   stage: module-pipelines
@@ -20,3 +21,13 @@ frontend:
   only:
     changes:
       - frontend/**/*
+
+deploy:
+  stage: deploy
+  trigger:
+    include:
+      - "/kubernetes/.gitlab-ci.yml"
+    strategy: depend
+  only:
+    changes:
+      - kubernetes/**/*

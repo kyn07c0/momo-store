@@ -1,0 +1,12 @@
+global:
+  environment: production
+  backend:
+    port: 8081
+  frontend:
+    port: 80
+
+ingress:
+  className: "nginx"
+  host: "kyn07c0.ru"
+
+dockerconfigjson: -
