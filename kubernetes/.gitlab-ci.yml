@@ -7,7 +7,7 @@ variables:
 
 release-helm-chart:
   stage: release
-  image: alpine/helm:3.10.3
+  image: alpine/helm:latest
   script:
     - cd kubernetes
     - helm package momo-store-chart --version $VERSION
@@ -17,7 +17,7 @@ install-helm-chart:
   variables:
     GIT_STRATEGY: none
   stage: deploy
-  image: alpine/helm:3.10.3
+  image: alpine/helm:latest
   script:
     - mkdir ~/.kube
     - echo "${KUBE_CONFIG}" > ~/.kube/config
