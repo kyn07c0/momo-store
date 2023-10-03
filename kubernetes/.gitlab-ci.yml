@@ -3,15 +3,15 @@ stages:
   - deploy
 
 variables:
-  CHART_VERSION: 0.1.${CI_PIPELINE_IID}
+  VERSION: 0.1.${CI_PIPELINE_IID}
 
 release-helm-chart:
   stage: release
   image: alpine/helm:3.10.0
   script:
     - cd kubernetes
-    - helm package momo-store-chart --version $CHART_VERSION
-    - curl -u ${NEXUS_HELM_USER}:${NEXUS_HELM_PASS} ${NEXUS_HELM_REPO} --upload-file momo-store-${CHART_VERSION}.tgz
+    - helm package momo-store-chart --version $VERSION
+    - curl -u ${NEXUS_HELM_USER}:${NEXUS_HELM_PASS} ${NEXUS_HELM_REPO} --upload-file momo-store-${VERSION}.tgz
 
 install-helm-chart:
   variables:
@@ -25,5 +25,5 @@ install-helm-chart:
     - helm repo update
     - >
       helm upgrade --atomic -i
-      --set dockerconfigjson="${DOCKERCONFIGJSON}"
-      momo-store nexus/momo-store --version $CHART_VERSION
+      --set dockerconfigjson="${DOCKER_CONFIG_JSON}"
+      momo-store nexus/momo-store --version $VERSION
