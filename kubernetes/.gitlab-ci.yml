@@ -7,7 +7,7 @@ variables:
 
 release-helm-chart:
   stage: release
-  image: alpine/helm:3.10.0
+  image: alpine/helm:3.10.3
   script:
     - cd kubernetes
     - helm package momo-store-chart --version $VERSION
@@ -17,13 +17,14 @@ install-helm-chart:
   variables:
     GIT_STRATEGY: none
   stage: deploy
-  image: alpine/helm:3.10.0
+  image: alpine/helm:3.10.3
   script:
     - mkdir ~/.kube
     - echo "${KUBE_CONFIG}" > ~/.kube/config
     - helm repo add nexus ${NEXUS_HELM_REPO} --username ${NEXUS_HELM_USER} --password ${NEXUS_HELM_PASS}
     - helm repo update
-    - >
-      helm upgrade --atomic --debug -i
-      --set dockerconfigjson="${DOCKER_CONFIG_JSON}"
-      momo-store nexus/momo-store --version $VERSION
+    - helm upgrade momo-store nexus/momo-store -i --atomic
+      #- >
+      #helm upgrade --atomic --debug -i
+      #--set dockerconfigjson="${DOCKER_CONFIG_JSON}"
+      #momo-store nexus/momo-store --version $VERSION
