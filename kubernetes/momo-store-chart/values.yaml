@@ -9,4 +9,4 @@ ingress:
   className: "nginx"
   host: "kyn07c0.ru"
 
-dockerconfigjson: -
+dockerconfigjson: XXX
