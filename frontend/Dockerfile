@@ -1,7 +1,8 @@
 # build
 FROM node:16-alpine3.18 as builder
 ARG VERSION=${VERSION}
-ARG NODE_ENV
+ARG VUE_APP_API_URL=kyn07c0.ru
+ARG NODE_ENV=dev
 WORKDIR /usr/src/app
 COPY package*.json ./
 COPY . .
