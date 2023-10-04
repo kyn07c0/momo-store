@@ -22,12 +22,12 @@ frontend:
     changes:
       - frontend/**/*
 
-deploy:
-  stage: deploy
-  trigger:
-    include:
-      - "/kubernetes/.gitlab-ci.yml"
-    strategy: depend
-  only:
-    changes:
-      - kubernetes/**/*
+#deploy:
+#  stage: deploy
+#  trigger:
+#    include:
+#      - "/kubernetes/.gitlab-ci.yml"
+#    strategy: depend
+#  only:
+#    changes:
+#      - kubernetes/**/*

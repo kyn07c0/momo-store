@@ -248,16 +248,3 @@ resource "yandex_dns_recordset" "rs1" {
   ttl     = 200
   data    = [yandex_vpc_address.addr.external_ipv4_address[0].address]
 }
-
-
-
-
-resource "yandex_cm_certificate" "le-certificate" {
-  name    = "cert-kyn07c0"
-  domains = ["kyn07c0.ru"]
-
-  managed {
-    challenge_type = "DNS_CNAME"
-    challenge_count = 1
-  }
-}

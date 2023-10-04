@@ -13,14 +13,7 @@ variable "cluster_name" {
   type = string
   nullable = false
   description = "Claster name"
-  default = "momo-cluster"
-}
-
-variable "namespace" {
-  type = string
-  nullable = false
-  description = "Name"
-  default = "momo"
+  default = "k8s-cluster"
 }
 
 variable "ver" {
@@ -121,3 +114,31 @@ variable "certificate_id" {
   default = ""
 }
 
+
+variable "k8s_node_vars" {
+  description = "Конфигурация групп узлов"
+  type        = list(map(string))
+  default     = [
+    {
+      type        = "staging",
+      ram         = "4",
+      cpu         = "2",
+      platform_id = "standard-v1",
+      size = "30"
+    },
+    {
+      type        = "production",
+      ram         = "4",
+      cpu         = "2",
+      platform_id = "standard-v1",
+      size = "30"
+    },
+    {
+      type        = "infra",
+      ram         = "4",
+      cpu         = "2",
+      platform_id = "standard-v1",
+      size = "30"
+    }
+  ]
+}
