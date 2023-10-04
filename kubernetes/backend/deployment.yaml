@@ -3,7 +3,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: backend
-  namespace: default
+  namespace: momo-store
   labels:
     app: backend
 spec:
@@ -31,7 +31,7 @@ spec:
           containerPort: 8081
         livenessProbe:
           httpGet:
-            path: /health
+            path: /
             port: 8081
           initialDelaySeconds: 15
           periodSeconds: 30

@@ -3,6 +3,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: frontend
+  namespace: momo-store
   labels:
     app: frontend
 spec:
@@ -24,19 +25,23 @@ spec:
         imagePullPolicy: Always
         resources:
           requests:
-            memory: "64Mi"
+            memory: "256Mi"
             cpu: "100m"
           limits:
-            memory: "128Mi"
+            memory: "512Mi"
             cpu: "200m"
         volumeMounts:
         - name: nginx-conf
-          mountPath: /etc/nginx/nginx.conf
-          subPath: nginx.conf
+          mountPath: /etc/nginx/conf.d/nginx-momo.conf
+          subPath: nginx-momo.conf
           readOnly: true
         ports:
         - name: frontend
           containerPort: 80
+        livenessProbe:
+            httpGet:
+              path: /
+              port: 80
       imagePullSecrets:
       - name: docker-config-secret
       volumes:
@@ -44,16 +49,5 @@ spec:
         configMap:
           name: nginx-conf
           items:
-          - key: nginx.conf
-            path: nginx.conf
-      affinity:
-        nodeAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:
-          - weight: 10
-            preference:  
-              matchExpressions:
-              - key: application
-                operator: In
-                values:
-                - front
-
+          - key: nginx-momo.conf
+            path: nginx-momo.conf 
