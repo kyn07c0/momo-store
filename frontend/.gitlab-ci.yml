@@ -66,14 +66,14 @@ upload-frontend-latest:
     - docker tag $CI_REGISTRY_IMAGE/momo-frontend:$VERSION $CI_REGISTRY_IMAGE/momo-frontend:latest
     - docker push $CI_REGISTRY_IMAGE/momo-frontend:latest
 
-#deploy:
-#  stage: deploy
-#  image:
-#    name: bitnami/kubectl:latest
-#    entrypoint: ['']
-#  script:
-#    - kubectl config set-cluster ${KUBE_CLUSTER} --server="${KUBE_SERVER}" --insecure-skip-tls-verify=true
-#    - kubectl config set-credentials ${KUBE_USER} --token="${KUBE_TOKEN}"
-#    - kubectl config set-context ${KUBE_USER}@${KUBE_CLUSTER} --cluster=${KUBE_CLUSTER} --user=${KUBE_USER}
-#    - kubectl config use-context ${KUBE_USER}@${KUBE_CLUSTER}
-#    - kubectl apply -f kubernetes/frontend
+deploy:
+  stage: deploy
+  image:
+    name: bitnami/kubectl:latest
+    #entrypoint: ['']
+  script:
+    - kubectl config set-cluster ${KUBE_CLUSTER} --server="${KUBE_SERVER}" --insecure-skip-tls-verify=true
+    - kubectl config set-credentials ${KUBE_USER} --token="${KUBE_TOKEN}"
+    - kubectl config set-context ${KUBE_USER}@${KUBE_CLUSTER} --cluster=${KUBE_CLUSTER} --user=${KUBE_USER}
+    - kubectl config use-context ${KUBE_USER}@${KUBE_CLUSTER}
+    - kubectl apply -f kubernetes/frontend

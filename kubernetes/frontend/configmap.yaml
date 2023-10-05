@@ -4,28 +4,21 @@ kind: ConfigMap
 metadata:
   name: nginx-conf
 data:
-  nginx-momo.conf: |
-    server {
-
-      resolver kube-dns.kube-system.svc.cluster.local valid=10s;
-
-      listen 80;
-      server_name localhost;
-
-      location / {
-        root   /app;
-        index  index.html;
-        try_files $uri $uri/ /index.html;
-      }
-
-      location /api {
-        set $api_name backend.momo-store.svc.cluster.local;
-        rewrite /api/(.*) /$1 break;
-        proxy_set_header  Host $host;
-        proxy_set_header  X-Real-IP $remote_addr;
-        proxy_set_header  X-Forwarded-For $remote_addr;
-        proxy_set_header  X-Forwarded-Host $remote_addr;
-        proxy_redirect off;
-        proxy_pass http://$api_name:8081;
-      }
+  nginx.conf: |
+    upstream myproxy {
+      server backend:8081;
     }
+
+    server {
+        listen 80;
+
+        location / {
+            root   /usr/share/nginx/html;
+            index  index.html;
+            try_files $uri $uri/ /index.html;
+        }
+
+        location /api/ {
+            proxy_pass http://myproxy/;
+        }
+    } 

@@ -1,17 +1,16 @@
 # build
-FROM node:16-alpine3.18 as builder
-ARG VUE_APP_API_URL=kyn07c0.ru
+FROM node:16 as builder
+ARG VUE_APP_API_URL=https://kyn07c0.ru/api
 ARG NODE_ENV=dev
 WORKDIR /usr/src/app
-COPY package*.json ./
+COPY ./package*.json ./
 RUN npm install
 COPY . .
 RUN npm run build
 
 # release
 FROM nginx:stable
-RUN mkdir /app
-COPY --from=builder /usr/src/app/dist /app
-COPY nginx-momo.conf /etc/nginx/conf.d/nginx-momo.conf
+RUN rm -rf /usr/share/nginx/html/*
+COPY --from=builder /usr/src/app/dist /usr/share/nginx/html/
 EXPOSE 80
-CMD nginx -g "daemon off;"
+ENTRYPOINT ["nginx", "-g", "daemon off;"]
