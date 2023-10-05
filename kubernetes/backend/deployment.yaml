@@ -7,13 +7,13 @@ metadata:
   labels:
     app: backend
 spec:
-  replicas: 2
+  replicas: 3
   revisionHistoryLimit: 15
   strategy:
     type: RollingUpdate
     rollingUpdate:
-      maxUnavailable: 2
-      maxSurge: 20%
+      maxUnavailable: 1
+      maxSurge: 1
   selector:
     matchLabels:    
       app: backend
