@@ -9,7 +9,7 @@ COPY . .
 RUN npm run build
 
 # release
-FROM nginx:stable
+FROM nginx:1.22.1-alpine
 RUN rm -rf /usr/share/nginx/html/*
 COPY --from=builder /usr/src/app/dist /usr/share/nginx/html/
 EXPOSE 80
