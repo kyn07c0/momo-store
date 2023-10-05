@@ -13,14 +13,14 @@ func NewFakeDumplingsStore() (dumplings.Store, error) {
 			Name:        "Пельмени",
 			Description: "С говядиной",
 			Price:       5.00,
-			Image:       "https://storage.yandexcloud.net/kyn07c0-momo-store/1.jpg",
+			Image:       "https://storage.yandexcloud.net/momo-object-storage/momo-store/dumplings/8dee5a92281746aa887d6f19cf9fdcc7.jpg",
 		},
 		{
 			ID:          2,
 			Name:        "Хинкали",
 			Description: "Со свининой",
 			Price:       3.50,
-			Image:       "https://storage.yandexcloud.net/kyn07c0-momo-store/2.jpg",
+			Image:       "https://storage.yandexcloud.net/momo-object-storage/momo-store/dumplings/50b583271fa0409fb3d8ffc5872e99bb.jpg",
 		},
 		{
 			ID:          3,
