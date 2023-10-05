@@ -69,7 +69,7 @@ upload-backend-latest:
 deploy:
   stage: deploy
   image: 
-   name: bitnami/kubectl:latest
+    name: bitnami/kubectl:latest
     entrypoint: ['']
   script:
     - kubectl config set-cluster ${KUBE_CLUSTER} --server="${KUBE_SERVER}" --insecure-skip-tls-verify=true 
