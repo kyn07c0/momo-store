@@ -9,7 +9,7 @@ spec:
   replicas: 1
   revisionHistoryLimit: 15
   strategy:
-    type: Recreate
+    type: RollingUpdate
   selector:
     matchLabels:
       app: frontend
@@ -30,9 +30,9 @@ spec:
             memory: "1024Mi"
             cpu: "200m"
         volumeMounts:
-        - name: nginx-conf
-          mountPath: /etc/nginx/nginx.conf
-          subPath: nginx.conf
+        - name: nginx-config
+          mountPath: /etc/nginx/conf.d/default.conf
+          subPath: default.conf
           readOnly: true
         ports:
         - name: frontend
@@ -44,9 +44,9 @@ spec:
       imagePullSecrets:
       - name: docker-config-secret
       volumes:
-      - name: nginx-conf
+      - name: nginx-config
         configMap:
-          name: nginx-conf
+          name: nginx-config
           items:
           - key: nginx.conf
-            path: nginx.conf 
+            path: default.conf 
