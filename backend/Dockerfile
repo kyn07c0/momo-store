@@ -1,11 +1,15 @@
-
-FROM golang:1.20-alpine as builder
-WORKDIR /build
-COPY . .
+FROM golang:1.17 as builder
+ARG VERSION=${VERSION}
+LABEL name="momo-backend" version=${VERSION}
+WORKDIR /app
+COPY go.mod go.sum ./
 RUN go mod download
-RUN CGO_ENABLED=0 GOOS=linux go build -o /main ./cmd/api
+COPY . .
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o api ./cmd/api
 
-FROM alpine:3.18
-COPY --from=builder main /bin/main
+FROM alpine:latest
+WORKDIR /root
+RUN apk --no-cache add curl
+COPY --from=builder /app/api .
 EXPOSE 8081
-ENTRYPOINT ["/bin/main"]
+CMD ["./api"]
