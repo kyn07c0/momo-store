@@ -1,10 +1,18 @@
-FROM golang:1.20-alpine as builder
-WORKDIR /build
-COPY . . 
-RUN go mod download
-RUN CGO_ENABLED=0 GOOS=linux go build -o /app ./cmd/api
+FROM golang:1.17-alpine3.16 AS builder
+WORKDIR /app
+COPY go.mod go.sum /app/
+RUN  go mod download
+COPY . /app
+RUN go build -o /app /app/...
 
-FROM alpine:latest
-COPY --from=builder app /bin/app
-EXPOSE 8081
-CMD ["/bin/app"]
+FROM alpine:3.16
+WORKDIR /app
+COPY --from=builder /app/api /app/api
+EXPOSE 8081 
+ENTRYPOINT ["/app/api"]
+
+
+#FROM alpine/curl:3.14
+#COPY api /bin/api
+#EXPOSE 8081
+#ENTRYPOINT ["/bin/api"]

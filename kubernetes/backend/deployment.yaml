@@ -12,8 +12,8 @@ spec:
   strategy:
     type: RollingUpdate
     rollingUpdate:
-      maxUnavailable: 1
-      maxSurge: 1
+      maxUnavailable: 80%
+      maxSurge: 20%
   selector:
     matchLabels:    
       app: backend
@@ -29,14 +29,6 @@ spec:
         ports:
         - name: backend
           containerPort: 8081
-        livenessProbe:
-          httpGet:
-            path: /
-            port: 8081
-          initialDelaySeconds: 15
-          periodSeconds: 30
-          timeoutSeconds: 2
-          failureThreshold: 6
       imagePullSecrets:
       - name: docker-config-secret
 
