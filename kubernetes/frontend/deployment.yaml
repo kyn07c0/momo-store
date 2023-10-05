@@ -31,8 +31,8 @@ spec:
             cpu: "200m"
         volumeMounts:
         - name: nginx-conf
-          mountPath: /etc/nginx/conf.d/nginx-momo.conf
-          subPath: nginx-momo.conf
+          mountPath: /etc/nginx/nginx.conf
+          subPath: nginx.conf
           readOnly: true
         ports:
         - name: frontend
@@ -48,5 +48,5 @@ spec:
         configMap:
           name: nginx-conf
           items:
-          - key: nginx-momo.conf
-            path: nginx-momo.conf 
+          - key: nginx.conf
+            path: nginx.conf 
