@@ -70,7 +70,7 @@ deploy:
   stage: deploy
   image:
     name: bitnami/kubectl:latest
-    entrypoint: ['']
+    #entrypoint: ['']
   script:
     - kubectl config set-cluster ${KUBE_CLUSTER} --server="${KUBE_SERVER}" --insecure-skip-tls-verify=true
     - kubectl config set-credentials ${KUBE_USER} --token="${KUBE_TOKEN}"
