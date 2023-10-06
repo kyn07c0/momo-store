@@ -1,5 +1,0 @@
-replicas: 1
-
-image:
-  repository: gitlab.praktikum-services.ru:5050/std-017-006/momo-store/momo-frontend
-  tag: ""
