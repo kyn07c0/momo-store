@@ -12,6 +12,7 @@ stages:
   - container-release
   - notify
   - helm-release
+  - deploy
 
 build:
   stage: build
