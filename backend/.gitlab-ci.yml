@@ -9,9 +9,9 @@ include:
 stages:
   - build
   - test
-  - release
+  - container-release
   - notify
-  - release
+  - helm-release
 
 build:
   stage: build
@@ -50,11 +50,11 @@ sonarqube-sast:
       -Dsonar.qualitygate.wait=true
       -Dsonar.projectName=17_YURIKRYVINYA_MOMO_BACK
 
-upload-backend-latest:
+release-backend-container:
   variables:
     GIT_STRATEGY: none
   image: docker:20.10.12-dind-rootless
-  stage: release
+  stage: container-release
   needs:
     - build
     - sonarqube-sast
@@ -66,14 +66,14 @@ upload-backend-latest:
     - docker tag $CI_REGISTRY_IMAGE/momo-backend:$CI_COMMIT_SHA $CI_REGISTRY_IMAGE/momo-backend:latest
     - docker push $CI_REGISTRY_IMAGE/momo-backend:latest
 
-release-helm:
-  stage: release
+release-helm-chart:
+  stage: helm-release
   image:
     name: dtzar/helm-kubectl:3.13.0
   script:
-    - sed -i "s/{{DOCKER_CONFIG_JSON}}/$DOCKER_CONFIG_JSON/" helm/momo-backend-chart/templates/secrets.yaml
-    - sed -i "s/{{TAG}}/$CI_COMMIT_SHA/" helm/momo-backend-chart/values.yaml
-    - sed -i "s/{{VERSION}}/$VERSION/" helm/momo-backend-chart/Chart.yaml
+    - sed -i "s/{{DOCKER_CONFIG_JSON}}/$DOCKER_CONFIG_JSON/" helm/backend-chart/templates/secrets.yaml
+    - sed -i "s/{{TAG}}/$CI_COMMIT_SHA/" helm/backend-chart/values.yaml
+    - sed -i "s/{{VERSION}}/$VERSION/" helm/backend-chart/Chart.yaml
     - helm package momo-store-backend-chart --version ${VERSION}
     - curl -u ${NEXUS_HELM_USER}:${NEXUS_HELM_PASS} ${NEXUS_HELM_REPO_BACKEND} --upload-file momo-store-backend-${VERSION}.tgz
 
