@@ -72,7 +72,6 @@ release-helm-chart:
   image: alpine/helm:latest
   script:
     - cd helm
-    - sed -i "s/{{DOCKER_CONFIG_JSON}}/$DOCKER_CONFIG_JSON/" frontend-chart/templates/secrets.yaml
     - sed -i "s/{{TAG}}/$CI_COMMIT_SHA/" frontend-chart/values.yaml
     - sed -i "s/{{VERSION}}/$VERSION/" frontend-chart/Chart.yaml
     - helm package frontend-chart --version ${VERSION}
