@@ -75,7 +75,8 @@ release-helm-chart:
     - sed -i "s/{{TAG}}/$CI_COMMIT_SHA/" backend-chart/values.yaml
     - sed -i "s/{{VERSION}}/$VERSION/" backend-chart/Chart.yaml
     - helm package backend-chart --version ${VERSION}
-    - curl -u ${NEXUS_HELM_USER}:${NEXUS_HELM_PASS} ${NEXUS_HELM_REPO_BACKEND} --upload-file momo-store-backend-${VERSION}.tgz
+    - ls .
+    - curl -u ${NEXUS_HELM_USER}:${NEXUS_HELM_PASS} ${NEXUS_HELM_REPO_BACKEND} --upload-file momo-backend-${VERSION}.tgz
 
 #deploy:
 #  stage: deploy
