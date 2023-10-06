@@ -39,10 +39,10 @@
         required 
       />
     </div>
-    <div class="d-flex justify-content-end">
-      <Center v-if="loading" class="mx-2">
+    <div class="d-flex justify-content-end" style="text-align=center">
+      <div v-if="loading" class="mx-2" style="margin-left:auto; margin-right:auto">
         <Spinner size="2rem" thickness="0.75rem" />
-      </Center>
+      </div>
       <button
         type="button" 
         class="btn btn-secondary me-3" 
