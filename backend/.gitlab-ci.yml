@@ -88,7 +88,7 @@ install-helm-chart:
     - echo "${KUBE_CONFIG}" > ~/.kube/config
     - helm repo add nexus ${NEXUS_HELM_REPO_BACKEND} --username ${NEXUS_HELM_USER} --password ${NEXUS_HELM_PASS}
     - helm repo update
-    - helm upgrade backend nexus/backend -i --atomic --namespace default --name backend
+    - helm upgrade backend nexus/backend -i --atomic --namespace default 
 
 
 
