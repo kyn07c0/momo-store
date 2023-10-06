@@ -28,7 +28,7 @@ resource "yandex_storage_bucket" "momo-store" {
 #  bucket = "kyn07c0-terraform"
 #}
 
-resource "yandex_storage_object" "image" {
+resource "yandex_storage_object" "images" {
   count = 14
   bucket = yandex_storage_bucket.momo-store.bucket
   key    = "${count.index + 1}.jpg"

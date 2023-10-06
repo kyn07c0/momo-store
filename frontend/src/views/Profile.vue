@@ -1,5 +1,5 @@
-<template style="text-align=center">
-  <div class="h-100" style="margin-left:auto; margin-right:auto">
+<template>
+  <Center class="h-100">
 
     <div class="card d-inline-block text-start">
 
@@ -21,7 +21,7 @@
 
     </div>
 
-  </div>
+  </Center>
 </template>
 
 <script lang="ts">

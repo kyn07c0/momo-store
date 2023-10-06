@@ -1,10 +1,10 @@
 <template>
   <Navbar />
-  <div class="mt-3 content-wrapper" style="text-align=center">
+  <div class="mt-3 content-wrapper">
     <router-view v-if="$store.state.auth.checked"/>
-    <div class="h-100" v-else style="margin-left:auto; margin-right:auto">
+    <Center class="h-100" v-else>
       <Spinner size="8rem" thickness="1.25rem"/>
-    </div>
+    </Center>
   </div>
 </template>
 
