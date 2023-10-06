@@ -27,7 +27,7 @@ spec:
     spec:
       containers:
       - name: {{ .Chart.Name }}
-        image: gitlab.praktikum-services.ru:5050/std-017-006/momo-store/momo-backend:latest
+        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
         imagePullPolicy: {{ .Values.image.pullPolicy}} 
         resources:
           requests:
