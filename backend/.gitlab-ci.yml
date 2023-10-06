@@ -68,13 +68,13 @@ release-backend-container:
 
 release-helm-chart:
   stage: helm-release
-  image:
-    name: dtzar/helm-kubectl:3.13.0
+  image: alpine/helm:latest
   script:
-    - sed -i "s/{{DOCKER_CONFIG_JSON}}/$DOCKER_CONFIG_JSON/" helm/backend-chart/templates/secrets.yaml
-    - sed -i "s/{{TAG}}/$CI_COMMIT_SHA/" helm/backend-chart/values.yaml
-    - sed -i "s/{{VERSION}}/$VERSION/" helm/backend-chart/Chart.yaml
-    - helm package helm/backend-chart --version ${VERSION}
+    - cd helm/backend-chart
+    - sed -i "s/{{DOCKER_CONFIG_JSON}}/$DOCKER_CONFIG_JSON/" templates/secrets.yaml
+    - sed -i "s/{{TAG}}/$CI_COMMIT_SHA/" values.yaml
+    - sed -i "s/{{VERSION}}/$VERSION/" Chart.yaml
+    - helm package backend-chart --version ${VERSION}
     - curl -u ${NEXUS_HELM_USER}:${NEXUS_HELM_PASS} ${NEXUS_HELM_REPO_BACKEND} --upload-file momo-store-backend-${VERSION}.tgz
 
 #deploy:
