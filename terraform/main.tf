@@ -7,6 +7,46 @@ terraform {
  }
 }
 
+
+resource "yandex_iam_service_account" "sa" {
+  name = "sa"
+  description = "Kubernetes Service account. Terraform created"
+}
+
+resource "yandex_resourcemanager_folder_iam_binding" "editor" {
+  folder_id = var.folder_id
+  role = "editor"
+  members = [ "serviceAccount:${yandex_iam_service_account.sa.id}" ]
+}
+
+resource "yandex_resourcemanager_folder_iam_binding" "images-puller" {
+  folder_id = var.folder_id
+  role = "container-registry.images.puller"
+  members = [ "serviceAccount:${yandex_iam_service_account.sa.id}" ]
+}
+
+resource "yandex_resourcemanager_folder_iam_binding" "vpc-publicAdmin" {
+  folder_id = var.folder_id
+  role = "vpc.publicAdmin"
+  members = [ "serviceAccount:${yandex_iam_service_account.sa.id}" ]
+}
+
+resource "yandex_resourcemanager_folder_iam_binding" "certificates-downloader" {
+  folder_id = var.folder_id
+  role = "certificate-manager.certificates.downloader"
+  members = [ "serviceAccount:${yandex_iam_service_account.sa.id}" ]
+}
+
+resource "yandex_resourcemanager_folder_iam_binding" "storage-viewer" {
+  folder_id = var.folder_id
+  role = "storage.viewer"
+  members = [ "serviceAccount:${yandex_iam_service_account.sa.id}" ]
+}
+
+
+
+
+
 resource "yandex_kubernetes_cluster" "k8s-cluster" {
   name        = "k8s-cluster" 
   description = "Terraform installed cluser"
@@ -74,8 +114,7 @@ resource "yandex_kubernetes_node_group" "k8s-node-group" {
     deploy_policy {
       max_expansion = 1
       max_unavailable = 1
-    }
-  
+    } 
 }
 
 resource "yandex_vpc_network" "k8s-network" {
@@ -88,58 +127,6 @@ resource "yandex_vpc_subnet" "k8s-subnet" {
   zone = var.zone_name
   network_id = yandex_vpc_network.k8s-network.id
 }
-
-
-resource "yandex_iam_service_account" "sa" {
-  name = "sa"
-  description = "Kubernetes Service account. Terraform created"
-}
-
-resource "yandex_resourcemanager_folder_iam_binding" "editor" {
-  folder_id = var.folder_id
-  role = "editor"
-  members = [ "serviceAccount:${yandex_iam_service_account.sa.id}" ]
-}
-
-resource "yandex_resourcemanager_folder_iam_binding" "images-puller" {
-  folder_id = var.folder_id
-  role = "container-registry.images.puller"
-  members = [ "serviceAccount:${yandex_iam_service_account.sa.id}" ]
-}
-
-resource "yandex_resourcemanager_folder_iam_binding" "vpc-publicAdmin" {
-  folder_id = var.folder_id
-  role = "vpc.publicAdmin"
-  members = [ "serviceAccount:${yandex_iam_service_account.sa.id}" ]
-}
-
-resource "yandex_resourcemanager_folder_iam_binding" "certificates-downloader" {
-  folder_id = var.folder_id
-  role = "certificate-manager.certificates.downloader"
-  members = [ "serviceAccount:${yandex_iam_service_account.sa.id}" ]
-}
-
-resource "yandex_resourcemanager_folder_iam_binding" "storage-viewer" {
-  folder_id = var.folder_id
-  role = "storage.viewer"
-  members = [ "serviceAccount:${yandex_iam_service_account.sa.id}" ]
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 resource "yandex_vpc_security_group" "k8s-public-services" {
@@ -195,3 +182,49 @@ resource "yandex_vpc_security_group" "k8s-public-services" {
     to_port           = 65535
   }
 }
+
+
+resource "yandex_vpc_address" "address" {
+  name = "static-ip"
+  external_ipv4_address {
+    zone_id = "ru-central1-a"
+  }
+}
+
+resource "yandex_dns_zone" "domain" {
+  name   = replace(var.domain, ".", "-")
+  zone   = join("", [var.domain, "."])
+  public = true
+  private_networks = [yandex_vpc_network.k8s-network.id]
+}
+
+resource "yandex_dns_recordset" "dns_domain_record" {
+  zone_id = yandex_dns_zone.domain.id
+  name    = join("", [var.domain, "."])
+  type    = "A"
+  ttl     = 200
+  data    = [yandex_vpc_address.address.external_ipv4_address[0].address]
+}
+
+
+#resource "yandex_cm_certificate" "cert_kyn07c0" {
+#  name    = "cert-kyn07c0"
+#  domains = ["kyn07c0.ru", "*.kyn07c0.ru"]
+
+#  managed {
+#    challenge_type  = "DNS_CNAME"
+#    challenge_count = 1 # "kyn07c0.ru" and "*.kyn07c0.ru" has the same DNS_CNAME challenge
+#  }
+#}
+
+#resource "yandex_dns_recordset" "example" {
+#  count   = yandex_cm_certificate.cert_kyn07c0.managed[0].challenge_count
+#  zone_id = "kyn07c0-zone-id"
+#  name    = yandex_cm_certificate.cert_kyn07c0.challenges[count.index].dns_name
+#  type    = yandex_cm_certificate.cert_kyn07c0.challenges[count.index].dns_type
+#  data    = [yandex_cm_certificate.cert_kyn07c0.challenges[count.index].dns_value]
+#  ttl     = 60
+#}
+
+
+

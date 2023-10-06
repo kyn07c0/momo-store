@@ -33,3 +33,10 @@ variable "secret_key" {
   sensitive = true
   default = "YCOFq_EqgsAo10yGdRxvZUwqFmuMkbhRDkTQE2z9"
 }
+
+variable "domain" {
+  description = "DNS domain"
+  sensitive = true
+  default = "kyn07c0.ru"
+}
+
