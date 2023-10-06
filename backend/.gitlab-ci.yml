@@ -70,7 +70,7 @@ release-helm-chart:
   stage: helm-release
   image: alpine/helm:latest
   script:
-    - cd helm/backend-chart
+    - cd helm
     - sed -i "s/{{DOCKER_CONFIG_JSON}}/$DOCKER_CONFIG_JSON/" templates/secrets.yaml
     - sed -i "s/{{TAG}}/$CI_COMMIT_SHA/" values.yaml
     - sed -i "s/{{VERSION}}/$VERSION/" Chart.yaml
