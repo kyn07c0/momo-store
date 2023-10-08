@@ -11,7 +11,7 @@ data:
     }
 
     server {
-        listen 80;
+        listen {{ .Values.containerPort }};
 
         location / {
             root   /usr/share/nginx/html;
@@ -19,7 +19,11 @@ data:
             try_files $uri $uri/ /index.html;
         }
 
-        location /api/ {
-            proxy_pass http://myproxy/;
+        location /catalog {
+            proxy_pass http://backend:{{ .Values.containerPort }};
+        }
+
+        location /cart {
+            proxy_pass http://backend:{{ .Values.containerPort }};
         }
     }
