@@ -43,13 +43,6 @@ sonarqube-sast:
       -Dsonar.qualitygate.wait=true
       -Dsonar.projectName=17_YURIKRYVINYA_MOMO_FRONT
 
-spotbugs-sast:
-  stage: test
-  variables:
-    COMPILE: "false"
-    SAST_JAVA_VERSION: 11
-    MAVEN_REPO_PATH: ${CI_PROJECT_DIR}/.m2/repository         
-
 release-frontend-container:
   variables:
     GIT_STRATEGY: none
