@@ -19,11 +19,8 @@ data:
             try_files $uri $uri/ /index.html;
         }
 
-        location /catalog {
-            proxy_pass http://backend:{{ .Values.containerPort }};
+        location /api/ {
+            proxy_pass http://myproxy/;
         }
 
-        location /cart {
-            proxy_pass http://backend:{{ .Values.containerPort }};
-        }
     }
