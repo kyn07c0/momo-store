@@ -82,9 +82,11 @@ install-helm-chart:
     GIT_STRATEGY: none
   stage: deploy
   image: alpine/helm:latest
-  script:
+  before_script:
     - mkdir ~/.kube
     - echo "${KUBE_CONFIG}" > ~/.kube/config
+    - chmod go-r ~/.kube/config
+  script:
     - helm repo add nexus ${NEXUS_HELM_REPO_FRONTEND} --username ${NEXUS_HELM_USER} --password ${NEXUS_HELM_PASS}
     - helm repo update
     - helm upgrade frontend nexus/frontend -i --namespace default 
