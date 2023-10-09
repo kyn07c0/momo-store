@@ -43,7 +43,11 @@ resource "yandex_resourcemanager_folder_iam_binding" "storage-viewer" {
   members = [ "serviceAccount:${yandex_iam_service_account.sa.id}" ]
 }
 
-
+#resource "yandex_resourcemanager_folder_iam_binding" "storage-admin" {
+#  folder_id = var.folder_id
+#  role = "storage.admin"
+#  members = [ "serviceAccount:${yandex_iam_service_account.sa.id}" ]
+#}
 
 
 
@@ -207,24 +211,27 @@ resource "yandex_dns_recordset" "dns_domain_record" {
 }
 
 
-#resource "yandex_cm_certificate" "cert_kyn07c0" {
-#  name    = "cert-kyn07c0"
-#  domains = ["kyn07c0.ru", "*.kyn07c0.ru"]
 
-#  managed {
-#    challenge_type  = "DNS_CNAME"
-#    challenge_count = 1 # "kyn07c0.ru" and "*.kyn07c0.ru" has the same DNS_CNAME challenge
-#  }
-#}
+resource "yandex_iam_service_account_static_access_key" "static-key" {
+  service_account_id = yandex_iam_service_account.sa.id
+}
 
-#resource "yandex_dns_recordset" "example" {
-#  count   = yandex_cm_certificate.cert_kyn07c0.managed[0].challenge_count
-#  zone_id = "kyn07c0-zone-id"
-#  name    = yandex_cm_certificate.cert_kyn07c0.challenges[count.index].dns_name
-#  type    = yandex_cm_certificate.cert_kyn07c0.challenges[count.index].dns_type
-#  data    = [yandex_cm_certificate.cert_kyn07c0.challenges[count.index].dns_value]
-#  ttl     = 60
-#}
+resource "yandex_storage_bucket" "kyn07c0-images" {
+  access_key = yandex_iam_service_account_static_access_key.static-key.access_key
+  secret_key = yandex_iam_service_account_static_access_key.static-key.secret_key
+  bucket = "kyn07c0-images"
+  anonymous_access_flags {
+    list = false
+    read = true
+  }
+}
+
+resource "yandex_storage_object" "images" {
+  count = 14
+  bucket = yandex_storage_bucket.kyn07c0-images.bucket
+  key    = "${count.index + 1}.jpg"
+  source = "images/${count.index + 1}.jpg"
+}
 
 
 
