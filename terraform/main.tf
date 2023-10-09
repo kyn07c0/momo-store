@@ -204,27 +204,3 @@ resource "yandex_dns_recordset" "dns_domain_record" {
   data    = [yandex_vpc_address.address.external_ipv4_address[0].address]
 }
 
-
-
-
-
-resource "yandex_iam_service_account_static_access_key" "access-key" {
-  service_account_id = yandex_iam_service_account.sa.id
-}
-
-resource "yandex_storage_bucket" "kyn07c0-images" {
-  access_key = yandex_iam_service_account_static_access_key.access-key.access_key
-  secret_key = yandex_iam_service_account_static_access_key.access-key.secret_key
-  bucket = "kyn07c0-images"
-  anonymous_access_flags {
-    list = false
-    read = true
-  }
-}
-
-resource "yandex_storage_object" "images" {
-  count = 14
-  bucket = yandex_storage_bucket.kyn07c0-images.bucket
-  key    = "${count.index + 1}.jpg"
-  source = "images/${count.index + 1}.jpg"
-}
