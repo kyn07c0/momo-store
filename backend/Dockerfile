@@ -9,4 +9,4 @@ FROM alpine:3.17.0
 WORKDIR /root/
 COPY --from=builder /app/main .
 EXPOSE 8081
-ENTRYPOINT [",/main"]
+ENTRYPOINT ["./main"]
