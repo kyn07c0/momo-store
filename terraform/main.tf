@@ -43,12 +43,6 @@ resource "yandex_resourcemanager_folder_iam_binding" "storage-viewer" {
   members = [ "serviceAccount:${yandex_iam_service_account.sa.id}" ]
 }
 
-#resource "yandex_resourcemanager_folder_iam_binding" "storage-admin" {
-#  folder_id = var.folder_id
-#  role = "storage.admin"
-#  members = [ "serviceAccount:${yandex_iam_service_account.sa.id}" ]
-#}
-
 
 
 resource "yandex_kubernetes_cluster" "k8s-cluster" {
@@ -212,13 +206,15 @@ resource "yandex_dns_recordset" "dns_domain_record" {
 
 
 
-resource "yandex_iam_service_account_static_access_key" "static-key" {
+
+
+resource "yandex_iam_service_account_static_access_key" "access-key" {
   service_account_id = yandex_iam_service_account.sa.id
 }
 
 resource "yandex_storage_bucket" "kyn07c0-images" {
-  access_key = yandex_iam_service_account_static_access_key.static-key.access_key
-  secret_key = yandex_iam_service_account_static_access_key.static-key.secret_key
+  access_key = yandex_iam_service_account_static_access_key.access-key.access_key
+  secret_key = yandex_iam_service_account_static_access_key.access-key.secret_key
   bucket = "kyn07c0-images"
   anonymous_access_flags {
     list = false
@@ -232,6 +228,3 @@ resource "yandex_storage_object" "images" {
   key    = "${count.index + 1}.jpg"
   source = "images/${count.index + 1}.jpg"
 }
-
-
-
