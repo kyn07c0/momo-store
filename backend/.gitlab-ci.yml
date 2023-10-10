@@ -6,27 +6,12 @@ include:
     file: 'DockerInDockerTemplate.yml'  
 
 stages:
-  - build
   - test
+  - build
   - container-release
   - notify
   - helm-release
   - deploy
-
-build:
-  stage: build
-  image: docker:20.10.12-dind-rootless
-  before_script:
-    - until docker info; do sleep 1; done
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-  script:
-    - cd backend
-    - >
-      docker build
-      --build-arg VERSION=$VERSION
-      --tag $CI_REGISTRY_IMAGE/momo-backend:$CI_COMMIT_SHA
-      .
-    - docker push $CI_REGISTRY_IMAGE/momo-backend:$CI_COMMIT_SHA
 
 sonarqube-sast:
   stage: test
@@ -52,28 +37,39 @@ sonarqube-sast:
 
 test-go:
   stage: test
-  rules:
-    - changes:
-        - backend/*
   image: golang:alpine3.18
   script:
     - cd backend
     - go test -v ./...
 
-release-backend-container:
-  variables:
-    GIT_STRATEGY: none
+build:
+  stage: build
   image: docker:20.10.12-dind-rootless
-  stage: container-release
-  needs:
-    - build
-    - sonarqube-sast
   before_script:
     - until docker info; do sleep 1; done
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script:
-    - docker pull $CI_REGISTRY_IMAGE/momo-backend:$CI_COMMIT_SHA
-    - docker tag $CI_REGISTRY_IMAGE/momo-backend:$CI_COMMIT_SHA $CI_REGISTRY_IMAGE/momo-backend:latest
+    - cd backend
+    - >
+      docker build
+      --build-arg VERSION=$VERSION
+      --tag $CI_REGISTRY_IMAGE/momo-backend:$VERSION
+      .
+    - docker push $CI_REGISTRY_IMAGE/momo-backend:$VERSION
+
+release-backend-container:
+  stage: container-release
+  image: docker:24.0.6-alpine3.18
+  needs:
+    - build
+    - sonarqube-sast
+    - test-go
+  before_script:
+    - until docker info; do sleep 1; done
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  script:
+    - docker pull $CI_REGISTRY_IMAGE/momo-backend:$VERSION
+    - docker tag $CI_REGISTRY_IMAGE/momo-backend:$VERSION $CI_REGISTRY_IMAGE/momo-backend:latest
     - docker push $CI_REGISTRY_IMAGE/momo-backend:latest
 
 release-helm-chart:
@@ -82,7 +78,7 @@ release-helm-chart:
   script:
     - cd helm
     - sed -i "s/{{DOCKER_CONFIG_JSON}}/$DOCKER_CONFIG_JSON/" backend-chart/templates/secrets.yaml
-    - sed -i "s/{{TAG}}/$CI_COMMIT_SHA/" backend-chart/values.yaml
+    - sed -i "s/{{TAG}}/$VERSION/" backend-chart/values.yaml
     - sed -i "s/{{VERSION}}/$VERSION/" backend-chart/Chart.yaml
     - helm package backend-chart --version ${VERSION}
     - curl -u ${NEXUS_HELM_USER}:${NEXUS_HELM_PASS} ${NEXUS_HELM_REPO_BACKEND} --upload-file backend-${VERSION}.tgz
@@ -99,17 +95,4 @@ install-helm-chart:
   script:
     - helm repo add nexus ${NEXUS_HELM_REPO_BACKEND} --username ${NEXUS_HELM_USER} --password ${NEXUS_HELM_PASS}
     - helm repo update
-    - helm upgrade backend nexus/backend -i --atomic --namespace default 
-
-
-#deploy:
-#  stage: deploy
-#  image: 
-#    name: bitnami/kubectl:latest
-#    entrypoint: ['']
-#  script:
-#    - kubectl config set-cluster ${KUBE_CLUSTER} --server="${KUBE_SERVER}" --insecure-skip-tls-verify=true 
-#    - kubectl config set-credentials ${KUBE_USER} --token="${KUBE_TOKEN}"
-#    - kubectl config set-context ${KUBE_USER}@${KUBE_CLUSTER} --cluster=${KUBE_CLUSTER} --user=${KUBE_USER}
-#    - kubectl config use-context ${KUBE_USER}@${KUBE_CLUSTER}
-#    - kubectl apply -f kubernetes/backend
+    - helm upgrade backend nexus/backend -i --set image.tag=$VERSION --atomic --namespace default
