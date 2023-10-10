@@ -1,5 +1,5 @@
 # build
-FROM node:alpine3.18 as builder
+FROM node:16 as builder
 ARG VUE_APP_API_URL=https://kyn07c0.ru/api
 ARG NODE_ENV=dev
 WORKDIR /usr/src/app
