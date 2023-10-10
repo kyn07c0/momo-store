@@ -76,11 +76,10 @@ release-helm-chart:
   stage: helm-release
   image: alpine/helm:latest
   script:
-    - cd helm
-    - sed -i "s/{{DOCKER_CONFIG_JSON}}/$DOCKER_CONFIG_JSON/" backend-chart/templates/secrets.yaml
-    - sed -i "s/{{TAG}}/$VERSION/" backend-chart/values.yaml
-    - sed -i "s/{{VERSION}}/$VERSION/" backend-chart/Chart.yaml
-    - helm package backend-chart --version ${VERSION}
+    - sed -i "s/{{DOCKER_CONFIG_JSON}}/$DOCKER_CONFIG_JSON/" helm/backend/templates/secrets.yaml
+    - sed -i "s/{{TAG}}/$VERSION/" helm/backend/values.yaml
+    - sed -i "s/{{VERSION}}/$VERSION/" helm/backend/Chart.yaml
+    - helm package helm/backend --version ${VERSION}
     - curl -u ${NEXUS_HELM_USER}:${NEXUS_HELM_PASS} ${NEXUS_HELM_REPO_BACKEND} --upload-file backend-${VERSION}.tgz
 
 install-helm-chart:
