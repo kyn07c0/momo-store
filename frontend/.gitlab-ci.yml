@@ -6,27 +6,12 @@ include:
     file: 'DockerInDockerTemplate.yml'  
 
 stages:
-  - build
   - test
+  - build
   - container-release
   - notify
   - helm-release
   - deploy
-
-build:
-  stage: build
-  image: docker:20.10.12-dind-rootless
-  before_script:
-    - until docker info; do sleep 1; done
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-  script:
-    - cd frontend
-    - >
-      docker build
-      --build-arg VERSION=$VERSION
-      --tag $CI_REGISTRY_IMAGE/momo-frontend:$CI_COMMIT_SHA
-      .
-    - docker push $CI_REGISTRY_IMAGE/momo-frontend:$CI_COMMIT_SHA
 
 sonarqube-sast:
   stage: test
@@ -43,6 +28,21 @@ sonarqube-sast:
       -Dsonar.qualitygate.wait=true
       -Dsonar.projectName=17_YURIKRYVINYA_MOMO_FRONT
 
+build:
+  stage: build
+  image: docker:20.10.12-dind-rootless
+  before_script:
+    - until docker info; do sleep 1; done
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  script:
+    - cd frontend
+    - >
+      docker build
+      --build-arg VERSION=$VERSION
+      --tag $CI_REGISTRY_IMAGE/momo-frontend:$VERSION
+      .
+    - docker push $CI_REGISTRY_IMAGE/momo-frontend:$VERSION
+
 release-frontend-container:
   variables:
     GIT_STRATEGY: none
@@ -55,8 +55,8 @@ release-frontend-container:
     - until docker info; do sleep 1; done
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script:
-    - docker pull $CI_REGISTRY_IMAGE/momo-frontend:$CI_COMMIT_SHA
-    - docker tag $CI_REGISTRY_IMAGE/momo-frontend:$CI_COMMIT_SHA $CI_REGISTRY_IMAGE/momo-frontend:latest
+    - docker pull $CI_REGISTRY_IMAGE/momo-frontend:$VERSION
+    - docker tag $CI_REGISTRY_IMAGE/momo-frontend:$VERSION $CI_REGISTRY_IMAGE/momo-frontend:latest
     - docker push $CI_REGISTRY_IMAGE/momo-frontend:latest
 
 release-helm-chart:
@@ -64,7 +64,7 @@ release-helm-chart:
   image: alpine/helm:latest
   script:
     - cd helm
-    - sed -i "s/{{TAG}}/$CI_COMMIT_SHA/" frontend-chart/values.yaml
+    - sed -i "s/{{TAG}}/$VERSION/" frontend-chart/values.yaml
     - sed -i "s/{{VERSION}}/$VERSION/" frontend-chart/Chart.yaml
     - helm package frontend-chart --version ${VERSION}
     - curl -u ${NEXUS_HELM_USER}:${NEXUS_HELM_PASS} ${NEXUS_HELM_REPO_FRONTEND} --upload-file frontend-${VERSION}.tgz
@@ -81,16 +81,4 @@ install-helm-chart:
   script:
     - helm repo add nexus ${NEXUS_HELM_REPO_FRONTEND} --username ${NEXUS_HELM_USER} --password ${NEXUS_HELM_PASS}
     - helm repo update
-    - helm upgrade frontend nexus/frontend -i --namespace default 
-
-#deploy:
-#  stage: deploy
-#  image:
-#    name: bitnami/kubectl:latest
-#    entrypoint: ['']
-#  script:
-#    - kubectl config set-cluster ${KUBE_CLUSTER} --server="${KUBE_SERVER}" --insecure-skip-tls-verify=true
-#    - kubectl config set-credentials ${KUBE_USER} --token="${KUBE_TOKEN}"
-#    - kubectl config set-context ${KUBE_USER}@${KUBE_CLUSTER} --cluster=${KUBE_CLUSTER} --user=${KUBE_USER}
-#    - kubectl config use-context ${KUBE_USER}@${KUBE_CLUSTER}
-#    - kubectl apply -f kubernetes/frontend
+    - helm upgrade frontend nexus/frontend -i --set image.tag=$VERSION --atomic --namespace default
