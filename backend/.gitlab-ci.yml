@@ -50,6 +50,16 @@ sonarqube-sast:
       -Dsonar.qualitygate.wait=true
       -Dsonar.projectName=17_YURIKRYVINYA_MOMO_BACK
 
+test-go:
+  stage: test
+  rules:
+    - changes:
+        - backend/*
+  image: golang:alpine3.18
+  script:
+    - cd backend
+    - go test -v ./...
+
 release-backend-container:
   variables:
     GIT_STRATEGY: none
