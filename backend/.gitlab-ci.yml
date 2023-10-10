@@ -38,9 +38,6 @@ sonarqube-sast:
 test-go:
   stage: test
   image: golang:alpine3.18
-  rules:
-    - changes:
-        - backend/*
   script:
     - cd backend
     - go test -v ./...
