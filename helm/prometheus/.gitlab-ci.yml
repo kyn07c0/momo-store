@@ -5,20 +5,6 @@ stages:
   - release
 #  - deploy
 
-.setup-ssh:
-  stage: deploy
-  image: alpine:3.15.0
-  before_script:
-    - apk add openssh-client
-    - eval $(ssh-agent -s)
-    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
-    - mkdir -p ~/.ssh
-    - chmod 600 ~/.ssh
-    - echo "$SSH_KNOWN_HOSTS" >> ~/.ssh/known_hosts
-    - chmod 644 ~/.ssh/known_hosts
-  script:
-    - ssh $SSH_USER@$SSH_HOST "id"
-
 
 upload_helm_chart:
   stage: release
@@ -26,7 +12,6 @@ upload_helm_chart:
     - curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
     - chmod 700 get_helm.sh
     - ./get_helm.sh
-    - sed -i "s/CHANGE_ME/0.0.${CI_PIPELINE_ID}/g" helm/prometheus/Chart.yaml
     - helm package helm/prometheus --version ${VERSION}
     - curl -u ${NEXUS_HELM_USER}:${NEXUS_HELM_PASS} ${NEXUS_HELM_REPO_PROMETHEUS} --upload-file prometheus-0.0.${VERSION}.tgz
 
