@@ -2,8 +2,8 @@ stages:
   - release
 #  - deploy
 
-include:
-  - local: 'setup_ssh.yml'
+#include:
+#  - local: 'setup_ssh.yml'
 
 upload_helm_chart:
   stage: release
