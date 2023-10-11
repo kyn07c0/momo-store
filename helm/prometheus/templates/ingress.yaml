@@ -11,7 +11,7 @@ metadata:
     nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
   rules:
-  - host: "kyn07c0.ru"
+  - host: "prometheus.kyn07c0.ru"
     http:
       paths:
       - path: /
