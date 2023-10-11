@@ -11,7 +11,7 @@ metadata:
     nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
   rules:
-  - host: "{{ .Release.Namespace }}-grafana.k8s.praktikum-services.tech"
+  - host: "grafana.kyn07c0.ru"
     http:
       paths:
       - path: /

@@ -31,3 +31,13 @@ prometheus:
   only:
     changes:  
       - helm/prometheus/**/*
+
+grafana:
+  stage: module-pipelines
+  trigger:
+    include:
+      - "/helm/grafana/.gitlab-ci.yml"
+    strategy: depend
+  only:
+    changes:  
+      - helm/grafana/**/*
