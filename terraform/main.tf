@@ -46,11 +46,11 @@ resource "yandex_resourcemanager_folder_iam_binding" "storage-viewer" {
 
 
 resource "yandex_kubernetes_cluster" "k8s-cluster" {
-  name        = "k8s-cluster" 
+  name = "k8s-cluster" 
   description = "Terraform installed cluser"
   network_id = yandex_vpc_network.k8s-network.id
 
-  service_account_id      = yandex_iam_service_account.sa.id
+  service_account_id = yandex_iam_service_account.sa.id
   node_service_account_id = yandex_iam_service_account.sa.id
   depends_on = [
     yandex_resourcemanager_folder_iam_binding.editor,
@@ -67,7 +67,6 @@ resource "yandex_kubernetes_cluster" "k8s-cluster" {
 
     version = "1.24"
     public_ip = true
-
   }
 }
 
@@ -128,80 +127,88 @@ resource "yandex_vpc_subnet" "k8s-subnet" {
 
 
 resource "yandex_vpc_security_group" "k8s-public-services" {
-  name        = "k8s-public-services"
-  network_id  = yandex_vpc_network.k8s-network.id
+  name = "k8s-public-services"
+  network_id = yandex_vpc_network.k8s-network.id
   ingress {
-    protocol          = "TCP"
+    protocol = "TCP"
     predefined_target = "loadbalancer_healthchecks"
-    from_port         = 0
-    to_port           = 65535
+    from_port = 0
+    to_port = 65535
   }
   ingress {
-    protocol          = "ANY"
+    protocol = "ANY"
     predefined_target = "self_security_group"
-    from_port         = 0
-    to_port           = 65535
+    from_port = 0
+    to_port = 65535
   }
   ingress {
-    protocol          = "ANY"
-    v4_cidr_blocks    = concat(yandex_vpc_subnet.k8s-subnet.v4_cidr_blocks)
-    from_port         = 0
-    to_port           = 65535
+    protocol = "ANY"
+    v4_cidr_blocks = concat(yandex_vpc_subnet.k8s-subnet.v4_cidr_blocks)
+    from_port = 0
+    to_port = 65535
   }
   ingress {
-    protocol          = "ICMP"
-    v4_cidr_blocks    = ["10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"]
+    protocol = "ICMP"
+    v4_cidr_blocks = ["10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"]
   }
   ingress {
-    protocol          = "TCP"
-    v4_cidr_blocks    = ["0.0.0.0/0"]
-    from_port         = 30000
-    to_port           = 32767
+    protocol = "TCP"
+    v4_cidr_blocks = ["0.0.0.0/0"]
+    from_port = 30000
+    to_port = 32767
   }
   ingress {
-    protocol          = "TCP"
-    v4_cidr_blocks    = ["0.0.0.0/0"]
-    port              = 6443
+    protocol = "TCP"
+    v4_cidr_blocks = ["0.0.0.0/0"]
+    port = 6443
   }
   ingress {
-    protocol          = "TCP"
-    v4_cidr_blocks    = ["0.0.0.0/0"]
-    port              = 443
+    protocol = "TCP"
+    v4_cidr_blocks = ["0.0.0.0/0"]
+    port = 443
   }
   ingress {
-    protocol          = "TCP"
-    v4_cidr_blocks    = ["0.0.0.0/0"]
-    port              = 80
+    protocol = "TCP"
+    v4_cidr_blocks = ["0.0.0.0/0"]
+    port = 80
   }
   egress {
-    protocol          = "ANY"
-    v4_cidr_blocks    = ["0.0.0.0/0"]
-    from_port         = 0
-    to_port           = 65535
+    protocol = "ANY"
+    v4_cidr_blocks = ["0.0.0.0/0"]
+    from_port = 0
+    to_port = 65535
   }
 }
 
-
-resource "yandex_vpc_address" "address" {
-  name = "static-ip"
-  external_ipv4_address {
-    zone_id = "ru-central1-a"
-  }
-}
 
 resource "yandex_dns_zone" "domain" {
-  name   = replace(var.domain, ".", "-")
-  zone   = join("", [var.domain, "."])
+  name = replace(var.domain, ".", "-")
+  zone = join("", [var.domain, "."])
   public = true
   private_networks = [yandex_vpc_network.k8s-network.id]
 }
 
 resource "yandex_dns_recordset" "dns_domain_record" {
   zone_id = yandex_dns_zone.domain.id
-  name    = join("", [var.domain, "."])
-  type    = "A"
-  ttl     = 200
-  data    = [yandex_vpc_address.address.external_ipv4_address[0].address]
+  name = join("", [var.domain, "."])
+  type = "A"
+  ttl = 200
+  data = [yandex_vpc_address.address.external_ipv4_address[0].address]
+}
+
+resource "yandex_dns_recordset" "dns_domain_prometheus" {
+  zone_id = yandex_dns_zone.domain.id
+  name = join("", ["prometheus.",var.domain, "."])
+  type = "A"
+  ttl = 200
+  data = [yandex_vpc_address.address.external_ipv4_address[0].address]
+}
+
+resource "yandex_vpc_address" "address" {
+  name = "static-ip"
+  external_ipv4_address {
+    zone_id = "ru-central1-a"
+  }
 }
 
 
@@ -213,5 +220,5 @@ resource "yandex_storage_bucket" "kyn07c0-images" {
   access_key = yandex_iam_service_account_static_access_key.account-static-key.access_key
   secret_key = yandex_iam_service_account_static_access_key.account-static-key.secret_key
   bucket = "kyn07c0-images"
-  acl    = "public-read"
+  acl = "public-read"
 }
