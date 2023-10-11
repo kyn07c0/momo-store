@@ -1,0 +1,25 @@
+stages:
+  - release
+#  - deploy
+
+include:
+  - local: 'setup_ssh.yml'
+
+upload_helm_chart:
+  stage: release
+  script:
+    - curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+    - chmod 700 get_helm.sh
+    - ./get_helm.sh
+    - sed -i "s/CHANGE_ME/0.0.${CI_PIPELINE_ID}/g" ./prometheus/Chart.yaml
+    - helm package prometheus
+    - curl -u ${NEXUS_HELM_USER}:${NEXUS_HELM_PASS} ${NEXUS_HELM_REPO_PROMETHEUS} --upload-file prometheus-0.0.${CI_PIPELINE_ID}.tgz
+
+#deploy_helm_chart:
+#  extends: .setup-ssh
+#  when: manual
+#  script:
+#    - ssh ${SSH_USER}@${SSH_HOST} "export "CI_PIPELINE_ID=${CI_PIPELINE_ID}";
+#      export "DOMAIN_USER=${DOMAIN_USER}";
+#      export "DOMAIN_PASSWORD=${DOMAIN_PASSWORD}";
+#      export "NEXUS_URL=${NEXUS_URL}"; bash -s" < ./prometheus/deploy.sh
