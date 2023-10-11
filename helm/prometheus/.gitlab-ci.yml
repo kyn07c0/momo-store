@@ -3,8 +3,6 @@ variables:
 
 stages:
   - release
-#  - deploy
-
 
 upload_helm_chart:
   stage: release
@@ -14,12 +12,3 @@ upload_helm_chart:
     - ./get_helm.sh
     - helm package helm/prometheus --version ${VERSION}
     - curl -u ${NEXUS_HELM_USER}:${NEXUS_HELM_PASS} ${NEXUS_HELM_REPO_PROMETHEUS} --upload-file prometheus-${VERSION}.tgz
-
-#deploy_helm_chart:
-#  extends: .setup-ssh
-#  when: manual
-#  script:
-#    - ssh ${SSH_USER}@${SSH_HOST} "export "CI_PIPELINE_ID=${CI_PIPELINE_ID}";
-#      export "DOMAIN_USER=${DOMAIN_USER}";
-#      export "DOMAIN_PASSWORD=${DOMAIN_PASSWORD}";
-#      export "NEXUS_URL=${NEXUS_URL}"; bash -s" < ./prometheus/deploy.sh
