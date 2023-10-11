@@ -22,12 +22,12 @@ frontend:
     changes:
       - frontend/**/*
 
-#deploy:
-#  stage: deploy
-#  trigger:
-#    include:
-#      - "/kubernetes/.gitlab-ci.yml"
-#    strategy: depend
-#  only:
-#    changes:
-#      - kubernetes/**/*
+prometheus:
+  stage: module-pipelines
+  trigger:
+    include:
+      - "/helm/prometheus/.gitlab-ci.yml"
+    strategy: depend
+  only:
+    changes:  
+      - helm/prometheus/**/*

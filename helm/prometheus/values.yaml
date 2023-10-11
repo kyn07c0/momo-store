@@ -17,4 +17,4 @@
 #    bearer_token: AQVN3veeVseTVUm4RFjy-WRt9INXbdkS6Q8iC3Bh
 #    scrape_interval: 60s
 
-yandex_cloud_services: []
+#yandex_cloud_services: []
