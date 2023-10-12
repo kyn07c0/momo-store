@@ -180,6 +180,12 @@ resource "yandex_vpc_security_group" "k8s-public-services" {
   }
 }
 
+resource "yandex_vpc_address" "address" {
+  name = "static-ip"
+  external_ipv4_address {
+    zone_id = "ru-central1-a"
+  }
+}
 
 resource "yandex_dns_zone" "domain" {
   name = replace(var.domain, ".", "-")
@@ -192,23 +198,24 @@ resource "yandex_dns_recordset" "dns_domain_record" {
   zone_id = yandex_dns_zone.domain.id
   name = join("", [var.domain, "."])
   type = "A"
-  ttl = 200
+  ttl = 300
   data = [yandex_vpc_address.address.external_ipv4_address[0].address]
 }
 
 resource "yandex_dns_recordset" "dns_domain_prometheus" {
   zone_id = yandex_dns_zone.domain.id
-  name = join("", ["prometheus.",var.domain, "."])
+  name = join("", ["prometheus.", var.domain, "."])
   type = "A"
-  ttl = 200
+  ttl = 300
   data = [yandex_vpc_address.address.external_ipv4_address[0].address]
 }
 
-resource "yandex_vpc_address" "address" {
-  name = "static-ip"
-  external_ipv4_address {
-    zone_id = "ru-central1-a"
-  }
+resource "yandex_dns_recordset" "dns_domain_grafana" {
+  zone_id = yandex_dns_zone.domain.id
+  name = join("", ["grafana.", var.domain, "."])
+  type = "A"
+  ttl = 300
+  data = [yandex_vpc_address.address.external_ipv4_address[0].address]
 }
 
 

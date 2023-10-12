@@ -2,8 +2,8 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: backend-{{ .Release.Name }}
-  namespace: default
+  name: {{ .Chart.Name }}
+  namespace: {{ .Release.Namespace }}
   labels:
     app: {{ .Chart.Name }}
     app.kubernetes.io/name: momo-{{ .Chart.Name }}
