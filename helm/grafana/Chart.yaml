@@ -1,5 +1,7 @@
+---
 apiVersion: v2
 name: grafana
+description: Grafana Helm Chart
 type: application
 version: {{VERSION}} 
-appVersion: "v{{VERSION}}"
+appVersion: {{VERSION}}
