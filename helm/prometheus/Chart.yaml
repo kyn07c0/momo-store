@@ -1,6 +1,7 @@
 ---
 apiVersion: v2
 name: prometheus
+description: Prometheus Helm Chart
 type: application
 version: {{VERSION}}
 appVersion: {{VERSION}}
