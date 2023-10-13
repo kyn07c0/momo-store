@@ -11,4 +11,4 @@ upload_helm_chart:
     - chmod 700 get_helm.sh
     - ./get_helm.sh
     - helm package helm/loki --version ${VERSION}
-    - curl -u ${NEXUS_HELM_USER}:${NEXUS_HELM_PASS} ${NEXUS_HELM_REPO_GRAFANA} --upload-file loki-${VERSION}.tgz
+    - curl -u ${NEXUS_HELM_USER}:${NEXUS_HELM_PASS} ${NEXUS_HELM_REPO_LOKI} --upload-file loki-${VERSION}.tgz

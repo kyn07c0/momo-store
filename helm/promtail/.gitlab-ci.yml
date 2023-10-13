@@ -12,4 +12,4 @@ upload_helm_chart:
     - ./get_helm.sh
     - sed -i "s/{{VERSION}}/${VERSION}/g" helm/promtail/Chart.yaml
     - helm package helm/promtail --version ${VERSION}
-    - curl -u ${NEXUS_HELM_USER}:${NEXUS_HELM_PASS} ${NEXUS_HELM_REPO_GRAFANA} --upload-file promtail-${VERSION}.tgz
+    - curl -u ${NEXUS_HELM_USER}:${NEXUS_HELM_PASS} ${NEXUS_HELM_REPO_PROMTAIL} --upload-file promtail-${VERSION}.tgz
