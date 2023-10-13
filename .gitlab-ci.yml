@@ -41,3 +41,23 @@ grafana:
   only:
     changes:  
       - helm/grafana/**/*
+
+loki:
+  stage: module-pipelines
+  trigger:
+    include:
+      - "/helm/loki/.gitlab-ci.yml"
+    strategy: depend
+  only:
+    changes:
+      - helm/loki/**/*
+
+promtail:
+  stage: module-pipelines
+  trigger:
+    include:
+      - "/helm/promtail/.gitlab-ci.yml"
+    strategy: depend
+  only:
+    changes:
+      - helm/promtail/**/*
