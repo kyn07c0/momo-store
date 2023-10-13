@@ -3,7 +3,7 @@ variables:
 
 stages:
   - release
-  - deploy
+  - install
 
 release_helm_chart:
   stage: release
@@ -15,10 +15,10 @@ release_helm_chart:
     - helm package helm/prometheus --version ${VERSION}
     - curl -u ${NEXUS_HELM_USER}:${NEXUS_HELM_PASS} ${NEXUS_HELM_REPO_PROMETHEUS} --upload-file prometheus-${VERSION}.tgz
 
-deploy-helm-chart:
+install-helm-chart:
   variables:
     GIT_STRATEGY: none
-  stage: deploy
+  stage: install
   image: alpine/helm:latest
   before_script:
     - mkdir ~/.kube

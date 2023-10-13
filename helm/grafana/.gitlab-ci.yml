@@ -3,7 +3,7 @@ variables:
 
 stages:
   - release
-  - deploy
+  - install
     
 release_helm_chart:
   stage: release
@@ -18,7 +18,7 @@ release_helm_chart:
 install-helm-chart:
   variables:
     GIT_STRATEGY: none
-  stage: deploy
+  stage: install
   image: alpine/helm:latest
   before_script:
     - mkdir ~/.kube
