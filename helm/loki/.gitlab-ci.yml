@@ -3,6 +3,7 @@ variables:
 
 stages:
   - release
+  - install
     
 upload_helm_chart:
   stage: release
@@ -13,3 +14,18 @@ upload_helm_chart:
     - sed -i "s/{{VERSION}}/${VERSION}/g" helm/loki/Chart.yaml
     - helm package helm/loki --version ${VERSION}
     - curl -u ${NEXUS_HELM_USER}:${NEXUS_HELM_PASS} ${NEXUS_HELM_REPO_LOKI} --upload-file loki-${VERSION}.tgz
+
+install-helm-chart:
+  variables:
+    GIT_STRATEGY: none
+  stage: install
+  image: alpine/helm:latest
+  before_script:
+    - mkdir ~/.kube
+    - echo "${KUBE_CONFIG}" > ~/.kube/config
+    - chmod go-r ~/.kube/config
+  script:
+    - helm repo add nexus ${NEXUS_HELM_REPO_LOKI} --username ${NEXUS_HELM_USER} --password ${NEXUS_HELM_PASS}
+    - helm repo update
+    - helm upgrade loki nexus/loki -i --set image.tag=$VERSION --atomic --namespace default
+
