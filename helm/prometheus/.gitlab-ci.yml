@@ -3,8 +3,9 @@ variables:
 
 stages:
   - release
+  - deploy
 
-upload_helm_chart:
+release_helm_chart:
   stage: release
   script:
     - curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
@@ -13,3 +14,17 @@ upload_helm_chart:
     - sed -i "s/{{VERSION}}/${VERSION}/g" helm/prometheus/Chart.yaml
     - helm package helm/prometheus --version ${VERSION}
     - curl -u ${NEXUS_HELM_USER}:${NEXUS_HELM_PASS} ${NEXUS_HELM_REPO_PROMETHEUS} --upload-file prometheus-${VERSION}.tgz
+
+deploy-helm-chart:
+  variables:
+    GIT_STRATEGY: none
+  stage: deploy
+  image: alpine/helm:latest
+  before_script:
+    - mkdir ~/.kube
+    - echo "${KUBE_CONFIG}" > ~/.kube/config
+    - chmod go-r ~/.kube/config
+  script:
+    - helm repo add nexus ${NEXUS_HELM_REPO_PROMETHEUS} --username ${NEXUS_HELM_USER} --password ${NEXUS_HELM_PASS}
+    - helm repo update
+    - helm upgrade prometheus nexus/prometheus -i --set image.tag=$VERSION --atomic --namespace default
