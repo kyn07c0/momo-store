@@ -1,10 +1,10 @@
 terraform {
- required_providers {
-  yandex = {
-  source  = "yandex-cloud/yandex"
-  version = "0.82.0"
+  required_providers {
+    yandex = {
+      source  = "yandex-cloud/yandex"
+      version = "0.82.0"
+    }
   }
- }
 }
 
 
@@ -114,6 +114,7 @@ resource "yandex_kubernetes_node_group" "k8s-node-group" {
     } 
 }
 
+
 resource "yandex_vpc_network" "k8s-network" {
   name = "k8s-network"
 }
@@ -186,6 +187,8 @@ resource "yandex_vpc_address" "address" {
     zone_id = "ru-central1-a"
   }
 }
+
+
 
 resource "yandex_dns_zone" "domain" {
   name = replace(var.domain, ".", "-")
