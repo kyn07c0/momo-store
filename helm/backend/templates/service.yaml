@@ -12,6 +12,5 @@ spec:
     - port: {{ .Values.containerPort }}
       protocol: TCP
       targetPort: {{ .Values.containerPort }}
-      nodePort: 30081
   selector:
     app: {{ .Chart.Name }}
