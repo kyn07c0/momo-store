@@ -1,17 +1,28 @@
 variables:
   VERSION: 1.0.${CI_PIPELINE_ID}
-    
-stages:
-  - deploy
 
-deploy:
-  image: dtzar/helm-kubectl:3.13.0
-  stage: deploy
+stages:
+  - helm-release
+  - helm-install
+    
+release-helm-chart:
+  stage: helm-release
+  image: alpine/helm:latest
   script:
-    - kubectl config set-cluster ${KUBE_CLUSTER} --server="${KUBE_SERVER}" --insecure-skip-tls-verify=true
-    - kubectl config set-credentials ${KUBE_USER} --token="${KUBE_TOKEN}"
-    - kubectl config set-context ${KUBE_USER}@${KUBE_CLUSTER} --cluster=${KUBE_CLUSTER} --user="${KUBE_USER}"
-    - kubectl config use-context ${KUBE_USER}@${KUBE_CLUSTER}
-    - helm repo add nexus ${NEXUS_HELM_REPO} --username ${NEXUS_HELM_USER --password ${NEXUS_HELM_PASS}
+    - sed -i "s/{{VERSION}}/${VERSION}/g" helm/backend/Chart.yaml
+    - helm package helm/backend --version ${VERSION}
+    - curl -u ${NEXUS_HELM_USER}:${NEXUS_HELM_PASS} ${NEXUS_HELM_REPO_BACKEND} --upload-file backend-${VERSION}.tgz
+
+install-helm-chart:
+  variables:
+    GIT_STRATEGY: none
+  stage: helm-install
+  image: alpine/helm:latest
+  before_script:
+    - mkdir ~/.kube
+    - echo "${KUBE_CONFIG}" > ~/.kube/config
+    - chmod go-r ~/.kube/config
+  script:
+    - helm repo add nexus ${NEXUS_HELM_REPO_BACKEND} --username ${NEXUS_HELM_USER} --password ${NEXUS_HELM_PASS}
     - helm repo update
-    - helm upgrade momo-store-backend nexus/momo-store-backend -i --atomic
+    - helm upgrade backend nexus/backend -i --atomic --set image.tag=$VERSION --namespace default
