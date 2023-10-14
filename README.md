@@ -10,6 +10,7 @@
 - директоря "helm" содержит helm-чарты для запуска приложений внутри кластера Kubernetes.
 
 ## Создание инфраструктуры в облаке Yandex.Cloude
+### Установка кластера
 1) Создать сервисный аккаунт с ролью editor
 2) Получить статический ключ доступа (access_key и secret_key)
 3) Создать бакет с ограниченным доступом для хранения состояния terraform.
@@ -39,30 +40,33 @@ terraform plan
 terraform apply
 ```
 
-## Настройка кластера Kubernetes
-1) Создайте статический файл конфигурации для доступа к кластеру Kubernetes
-2) Установите Ingress-контроллер NGINX
+### Подключение к кластеру
+Создайте статический файл конфигурации для доступа к кластеру Kubernetes
+
+### Настройка единой точки входа трафика в кластер Kubernetes
+Установите Ingress-контроллер NGINX
 ```
 helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx 
 helm repo update
 helm install ingress-nginx ingress-nginx/ingress-nginx
 ```
-3) Установите менеджер сертификатов
-```
-kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v1.13.1/cert-manager.yaml
-```
-4) Убедитесь, что в пространстве имен cert-manager создано три пода с готовностью 1/1 и статусом Running:
-```
-kubectl get pods -n cert-manager --watch
-```
-5) Узнайте внешний ip-адрес ingress-контроллера(EXTERNAL-IP)
+Узнайте внешний ip-адрес ingress-контроллера(EXTERNAL-IP)
 ```
 kubectl get svc
 ```
 В сервисе Cloud DNS выберите зону соответствующую вашему домену и установите значение записи типа А равное внешнему ip-адресу ingress-контроллера.
 
+### Установка сертификата
+Установите менеджер сертификатов
+```
+kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v1.13.1/cert-manager.yaml
+```
+Убедитесь, что в пространстве имен cert-manager создано три пода с готовностью 1/1 и статусом Running:
+```
+kubectl get pods -n cert-manager --watch
+```
 
-## Доменное имя
+### Доменное имя
 Зарегистрируйте домен для интернет-магазина.
 Для этого укажите адреса серверов имен Yandex Cloud в NS-записях вашего регистратора:
 - ns1.yandexcloud.net
