@@ -20,4 +20,3 @@ frontend:
   only:
     changes:
       - frontend/**/*
-

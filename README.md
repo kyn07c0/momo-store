@@ -98,6 +98,10 @@ kubectl apply -f kubernetes/frontend
 ## Мониторинг
 Для отслеживания состояния приложения установлены Prometheus, Grafana и Loki.
 ### Установка Prometheuse
+```
+helm install --atomic prometheus helm/prometheus
+kubectl apply -f ./admin-user.yaml
+```
 
 ### Установка Grafana
 
