@@ -5,7 +5,7 @@ metadata:
   name: prometheus-conf
   namespace: {{ .Release.Namespace }}
   labels:
-    app: prometheus
+    app: {{ .Chart.Name }}
 data:
   prometheus.yml: |
     global:
