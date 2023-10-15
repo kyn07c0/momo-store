@@ -104,6 +104,9 @@ kubectl apply -f ./admin-user.yaml
 ```
 
 ### Установка Grafana
+```
+helm install --atomic grafana helm/grafana
+```
 
 ### Установка Loki
 ```
@@ -111,8 +114,6 @@ helm repo add grafana https://grafana.github.io/helm-charts
 helm repo update
 helm install --atomic loki grafana/loki-stack
 ```
-
-
 
 ## Пример работы
 Приложение: [kyn07c0.ru](https://kyn07c0.ru)
