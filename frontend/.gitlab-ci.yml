@@ -75,7 +75,7 @@ install-helm-chart:
   image: alpine/helm:latest
   before_script:
     - mkdir ~/.kube
-    - echo "${KUBE_CONFIG}" > ~/.kube/config
+    - echo "${KUBE_CONFIG}" | base64 -d > ~/.kube/config
     - chmod go-r ~/.kube/config
   script:
     - helm repo add nexus ${NEXUS_HELM_REPO_FRONTEND} --username ${NEXUS_HELM_USER} --password ${NEXUS_HELM_PASS}
