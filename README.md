@@ -103,7 +103,7 @@ kubectl apply -f kubernetes/frontend
 ## Пример работы
 Приложение: [kyn07c0.ru](https://kyn07c0.ru)
 
-Grafana: [grafana.kyn07c0.ru](https://grafana.kyn07c0.ru)
+Grafana: [grafana.kyn07c0.ru](https://grafana.kyn07c0.ru) (user/user)
 
 
 
