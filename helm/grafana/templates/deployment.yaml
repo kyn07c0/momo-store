@@ -1,34 +1,34 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: grafana
+  name: {{ .Chart.Name }}
   namespace: {{ .Release.Namespace }}
 spec:
   selector:
     matchLabels:
-      app: grafana
+      app: {{ .Chart.Name }}
   template:
     metadata:
       labels:
-        app: grafana
+        app: {{ .Chart.Name }}
     spec:
       securityContext:
         fsGroup: 472
         supplementalGroups:
           - 0
       containers:
-        - name: grafana
-          image: grafana/grafana:9.5.12
+        - name: {{ .Chart.Name }}
+          image: grafana/grafana:10.1.5
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 3000
-              name: http-grafana
+            - name: http-grafana
+              containerPort: {{ .Values.port }}
               protocol: TCP
           readinessProbe:
             failureThreshold: 3
             httpGet:
               path: /robots.txt
-              port: 3000
+              port: {{ .Values.port }}
               scheme: HTTP
             initialDelaySeconds: 10
             periodSeconds: 30
@@ -40,7 +40,7 @@ spec:
             periodSeconds: 10
             successThreshold: 1
             tcpSocket:
-              port: 3000
+              port: {{ .Values.port }}
             timeoutSeconds: 1
           resources:
             requests:
