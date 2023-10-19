@@ -1,5 +1,5 @@
-cloud_id = "b1g9rramuashv1f7ie3a"
-folder_id = "b1g0j845i7calp33d0tc"
-token = "y0_AgAAAABhEo23AATuwQAAAADtKAyLe1s-MJqDT9WasZ0-Fk5W4HhQzUA"
+cloud_id = ""
+folder_id = ""
+token = ""
 zone_name = "ru-central1-a"
 domain = "kyn07c0.ru"
